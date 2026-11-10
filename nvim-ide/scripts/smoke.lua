@@ -383,5 +383,24 @@ do
   check("tab menu closes with Esc", vim.api.nvim_win_get_config(0).relative == "")
 end
 
+-- Splits and layouts: save and load a split layout
+do
+  local pd = vim.fn.tempname(); vim.fn.mkdir(pd, "p")
+  vim.fn.writefile({ "1" }, pd .. "/one.txt"); vim.fn.writefile({ "2" }, pd .. "/two.txt")
+  local L = require("config.layout")
+  vim.cmd("only"); vim.cmd("edit " .. pd .. "/one.txt"); L.split("right"); vim.cmd("edit " .. pd .. "/two.txt")
+  L.save("smoke"); vim.cmd("only"); L.load("smoke"); vim.wait(100)
+  local eds = 0
+  for _, w in ipairs(vim.api.nvim_list_wins()) do if vim.bo[vim.api.nvim_win_get_buf(w)].buftype == "" then eds = eds + 1 end end
+  check("a saved layout restores both splits", eds >= 2, eds)
+  vim.cmd("only")
+end
+
+-- Remote module and commands
+do
+  check("remote module loads", type(require("config.remote").pick) == "function")
+  check("commands :IDERemote and :IDELayoutLoad exist", vim.fn.exists(":IDERemote") == 2 and vim.fn.exists(":IDELayoutLoad") == 2)
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

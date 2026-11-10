@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0 - Splits and layouts
+
+Split right / below, close, maximize and equalize editor windows; save and load named layouts.
+
 ## 0.6.0 - Tab features
 
 Right-click a tab for pin, move, close others / to the right, copy path and reveal in Explorer. Alt-< / Alt-> move a tab; Shift-h / Shift-l follow the tab order.

@@ -62,5 +62,11 @@ end
 vim.api.nvim_create_user_command("IDEUpdate", update_all, { desc = "Update plugins and language tools" })
 map("n", "<leader>pU", update_all, "Update plugins + tools")
 
+-- Splits & layout, tasks, snippets, Claude on the selection
+map("n", "<leader>sv", function() require("config.layout").split("right") end, "Split right")
+map("n", "<leader>sh", function() require("config.layout").split("below") end, "Split below")
+map("n", "<leader>sx", function() require("config.layout").close_split() end, "Close split")
+map("n", "<leader>sm", function() require("config.layout").maximize() end, "Maximize / restore split")
+map("n", "<leader>se", function() require("config.layout").equalize() end, "Equalize splits")
 -- VS Code-style shortcuts
 if require("config").feature("vscode_keys") then require("config.vscode_keys") end
