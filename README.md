@@ -58,6 +58,29 @@ Check what is missing at any time with `nvim-ide/scripts/doctor.sh`.
 
 ## Install
 
+### One line (checks a checksum first)
+
+```sh
+curl -fsSLO https://raw.githubusercontent.com/a-goodarzi/vim-ide/main/install.sh
+curl -fsSLO https://raw.githubusercontent.com/a-goodarzi/vim-ide/main/install.sh.sha256
+sha256sum -c install.sh.sha256 && bash install.sh        # macOS: shasum -a 256 -c install.sh.sha256
+```
+
+It installs the newest release into `~/.local/share/vim-ide` (`--ref TAG`, `--dir DIR`) and runs `dev.sh`. No sudo.
+
+### Try it in Docker (nothing is installed on your machine)
+
+```sh
+docker build -t vim-ide .
+docker run --rm -it -v "$PWD":/work vim-ide
+```
+
+### Homebrew (macOS / Linux)
+
+`packaging/homebrew/vim-ide.rb` is a formula template (untested): put it in a tap, then `brew install vim-ide`.
+
+### From a clone
+
 ```sh
 git clone https://github.com/a-goodarzi/vim-ide.git
 cd vim-ide/nvim-ide

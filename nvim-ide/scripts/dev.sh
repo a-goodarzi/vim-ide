@@ -33,6 +33,7 @@ nvim --version | head -1
 
 step "2/6 config -> $TARGET"
 TEMPLATE="$HERE/assets/template"
+mkdir -p "$(dirname "$TARGET")"      # a fresh account may not have ~/.config yet
 if [[ $COPY -eq 0 ]]; then
   if [[ -L "$TARGET" ]]; then ln -sfn "$TEMPLATE" "$TARGET"; echo "symlink refreshed: $TARGET -> $TEMPLATE"
   else

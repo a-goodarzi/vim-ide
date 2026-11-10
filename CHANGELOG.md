@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.21.0 - Install options
+
+A one-line installer with a checksum (install.sh), a Dockerfile to try the IDE without installing (the image builds and passes all smoke tests on a clean Fedora), and a Homebrew formula template. dev.sh no longer fails on an account that has no ~/.config yet.
+
 ## 0.20.0 - Contribution docs
 
 CONTRIBUTING.md, a guide to adding a language, theme or feature, issue and pull request templates.
