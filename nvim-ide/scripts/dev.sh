@@ -26,7 +26,7 @@ if ((${#miss[@]})); then
   echo "Missing: ${miss[*]}"
   echo "Fedora: sudo dnf install -y neovim git make gcc ripgrep nodejs tree-sitter-cli"
   echo "Debian/Ubuntu: sudo apt install -y neovim git make gcc ripgrep nodejs  (tree-sitter: npm i -g tree-sitter-cli)"
-  echo "macOS: brew install neovim git ripgrep node tree-sitter-cli   (the CLI is its own formula; 'tree-sitter' alone is only the library)"
+  echo "macOS: brew install neovim git ripgrep node tree-sitter-cli   (the CLI is its own formula; 'tree-sitter' alone is only the library; or: npm i -g tree-sitter-cli)"
   have nvim || { echo "nvim is required; stopping."; exit 1; }
 fi
 nvim --version | head -1

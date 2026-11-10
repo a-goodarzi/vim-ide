@@ -67,6 +67,8 @@ function M.run()
   if vim.o.termguicolors then add("ok", "True colour", "on") else add("warn", "True colour", "termguicolors is off: use a modern terminal") end
   local cmd = ""
   if #pkgs > 0 and mgr ~= "other" then cmd = INSTALL[mgr] .. table.concat(pkgs, " ") end
+  -- If the system package is unavailable or deprecated for you, the CLI also installs from npm, cargo or a GitHub release.
+  M.tree_sitter_alternatives = "npm i -g tree-sitter-cli   |   cargo install --locked tree-sitter-cli   |   binary: github.com/tree-sitter/tree-sitter/releases"
   if #npm > 0 then cmd = cmd .. (cmd ~= "" and "  &&  " or "") .. "npm i -g " .. table.concat(npm, " ") end
   return res, cmd
 end
@@ -93,6 +95,13 @@ local page = ui.page({
       b:add(b.margin .. "Install what is missing:", "IDEHeading"); b:add(b.margin .. "  " .. cmd, "IDEKey"); b:add(b.margin .. "  (y copies it)", "IDEMuted")
     elseif s.fail + s.warn == 0 then b:add(b.margin .. "Everything is in place.", "IDEOn")
     else b:add(b.margin .. "Install the missing tools with your package manager.", "IDEMuted") end
+    b:blank()
+    for _, r in ipairs(res) do
+      if r.tool == "tree-sitter" and r.level ~= "ok" then
+        b:blank(); b:add(b.margin .. "tree-sitter CLI, if the package above is unavailable or deprecated for you:", "IDEHeading")
+        b:add(b.margin .. "  " .. M.tree_sitter_alternatives, "IDEKey")
+      end
+    end
     b:blank()
     b:add(b.margin .. "Language servers, formatters and debuggers are managed by Mason (:Mason).", "IDEMuted")
   end,

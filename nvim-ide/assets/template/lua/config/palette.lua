@@ -166,7 +166,7 @@ function M.open()
       entry_maker = function(it)
         return {
           value = it, ordinal = it[1] .. " " .. it[2],
-          display = function() return displayer({ { it[1], it[1] == "Recent" and "IDEKey" or "Comment" }, it[2], { it[3], "Comment" } }) end,
+          display = function() return displayer({ { it[1], it[1] == "Recent" and "IDEKey" or "Comment" }, it[2], { require("config.keys").fmt(it[3]), "Comment" } }) end,
         }
       end,
     }),

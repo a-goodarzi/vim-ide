@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.25.0 - Mac shortcut notation
+
+On macOS (or with Settings > Appearance > Shortcut notation = mac) Help, the command palette, the tour and the welcome page show shortcuts as ⌃ ⌥ ⇧ instead of Ctrl / Alt / Shift, with a note about sending Option as Meta. The tree-sitter hints now also list npm, cargo and release-binary installs in case the Homebrew formula is unavailable.
+
 ## 0.24.0 - ide update updates the IDE
 
 `ide update` now updates the IDE itself (latest release from GitHub, with the changelog of what is new), then plugins and tools; `ide update check` only looks, `ide update ide|plugins` does one half, `ide version` shows the version. Local edits block the IDE update. Also: nvim and the launcher append Homebrew, cargo and npm bin folders to PATH, so tools like tree-sitter are found even from a minimal shell, and the doctor shows the tree-sitter version.

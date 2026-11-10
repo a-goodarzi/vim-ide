@@ -113,7 +113,9 @@ local ui = require("config.ui")
 local page = ui.page({
   name = "Help", ft = "ide-help", sections = sections,
   render = function(_, b)
+    local keys = require("config.keys"); keys.wrap(b)
     b:title("Help", "Features, commands and shortcuts. Search with /  (n = next match). q closes this tab.")
+    if keys.mac_note() then b:add(b.margin .. keys.mac_note(), "IDEWarn"); b:blank() end
     b:jumpbar(sections)
     b:head(sections[1], 1)
     for _, l in ipairs({
@@ -130,12 +132,18 @@ local page = ui.page({
     end
 
     b:head(sections[3], 3)
-    for _, c in ipairs(commands) do b:add(b.margin .. string.format("%-30s %s", c[1], c[2]), nil, { keycol = true }) end
+    for _, c in ipairs(commands) do
+      local k = ui.pad(keys.fmt(c[1]), 30)
+      b:add(b.margin .. k .. " " .. c[2], nil, { keycol = #b.margin + #k })
+    end
 
     b:head(sections[4], 4)
     for _, sec in ipairs(require("config.cheatsheet").sections) do
       b:add(b.margin .. sec[1], "IDEAccent")
-      for _, row in ipairs(sec[2]) do b:add(b.margin .. string.format("   %-28s %s", row[1], row[2]), nil, { keycol = true }) end
+      for _, row in ipairs(sec[2]) do
+        local k = ui.pad(keys.fmt(row[1]), 28)
+        b:add(b.margin .. "   " .. k .. " " .. row[2], nil, { keycol = #b.margin + 3 + #k })
+      end
       b:blank()
     end
 
@@ -149,7 +157,7 @@ local page = ui.page({
 local render = page.render
 function page:render()
   local b = render(self)
-  if b then for l, m in pairs(b.meta) do if m and m.keycol then vim.api.nvim_buf_add_highlight(self.buf, self.ns, "IDEKey", l - 1, 3, 34) end end end
+  if b then for l, m in pairs(b.meta) do if m and m.keycol then vim.api.nvim_buf_add_highlight(self.buf, self.ns, "IDEKey", l - 1, 3, type(m.keycol) == "number" and m.keycol or 34) end end end
   return b
 end
 

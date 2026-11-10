@@ -21,6 +21,8 @@ local schema = {
     live = function() require("config.theme").apply() end },
   { key = "statusline_style", type = "enum", values = { "rounded", "powerline", "plain" }, label = "Statusline style",
     desc = "rounded = powerlevel10k-like pills, powerline = arrows (needs icons)", live = function() require("config.statusline").apply() end },
+  { key = "key_style", type = "enum", values = { "auto", "mac", "pc" }, label = "Shortcut notation",
+    desc = "auto = ⌃ ⌥ ⇧ symbols on a Mac, Ctrl / Alt / Shift elsewhere (the keys themselves do not change)" },
   { key = "tabs_style", type = "enum", values = { "slanted", "rounded", "flat" }, label = "Tab style",
     desc = "slanted = trapezoid tabs, rounded = pills, flat = plain blocks", live = function() vim.cmd.redrawtabline() end },
   { key = "features.icons", type = "bool", label = "Icons (Nerd Font)", desc = "Turn off if icons look broken; forces plain statusline", restart = true },

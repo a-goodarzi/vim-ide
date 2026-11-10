@@ -40,7 +40,7 @@ local function show(i)
   if not s then return close() end
   close()
   local lines = { "" }
-  for _, l in ipairs(s.text) do lines[#lines + 1] = "  " .. l end
+  for _, l in ipairs(s.text) do lines[#lines + 1] = "  " .. require("config.keys").fmt(l) end
   lines[#lines + 1] = ""
   lines[#lines + 1] = "  " .. (i < #list and "Enter next" or "Enter finish") .. "   h back   q quit"
   local w = 0

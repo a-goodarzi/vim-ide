@@ -24,6 +24,7 @@ end
 local page = ui.page({
   name = "Welcome", ft = "ide-welcome",
   render = function(_, b)
+    local keys = require("config.keys"); keys.wrap(b)
     b:title("Welcome to nvim-ide", "A short first-run check. q closes this; :IDEWelcome brings it back.")
     b:head("1  Do the icons look right?", 1)
     b:add(b.margin .. "   \xee\x9c\xa5   \xef\x80\x82   \xef\x85\x9b   \xef\x84\xa0   \xee\x82\xb2\xee\x82\xb0   \xee\x82\xba\xee\x82\xb8", "IDEAccent")
@@ -50,7 +51,8 @@ local page = ui.page({
       { "F1", "Command palette: everything the IDE can do" }, { "Ctrl-P", "Open a file by name" },
       { "Alt-f", "Search & Replace in the project" }, { "Alt-g", "Source Control: stage, commit, push" },
       { "Alt-t", "Terminal panel" }, { "Alt-c", "Claude Code panel" }, { "<Space>", "Pause after it: a menu lists every shortcut" },
-    }) do b:add(b.margin .. string.format("%-9s %s", k[1], k[2]), nil, { keycol = true }) end
+    }) do b:add(b.margin .. ui.pad(keys.fmt(k[1]), 9) .. " " .. k[2], nil, { keycol = true }) end
+    if keys.mac_note() then b:blank(); b:add(b.margin .. keys.mac_note(), "IDEWarn") end
     b:blank()
     b:add(b.margin .. "t   Take a one-minute tour", "IDEKey", { act = "t" })
     b:add(b.margin .. "h   Full Help       s   Settings       q   Close", "IDEKey")

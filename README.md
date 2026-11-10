@@ -30,6 +30,7 @@ works inside tmux, and every screen shares one design system.
 - **Tab style option:** Settings > Appearance > Tab style switches the tab bar between slanted (trapezoids), rounded (pills) and flat (plain blocks), live.
 - **Safe updates:** `ide update` / :IDEUpdate saves the plugin lockfile first and lists what changed (updated, added, removed); `ide rollback` / :IDERollback puts the saved lockfile back and restores those plugin versions. Verified end to end in a clean container.
 - **ide update updates the IDE:** `ide update` now updates the IDE itself (latest release from GitHub, with the changelog of what is new), then plugins and tools; `ide update check` only looks, `ide update ide|plugins` does one half, `ide version` shows the version. Local edits block the IDE update. Also: nvim and the launcher append Homebrew, cargo and npm bin folders to PATH, so tools like tree-sitter are found even from a minimal shell, and the doctor shows the tree-sitter version.
+- **Mac shortcut notation:** On macOS (or with Settings > Appearance > Shortcut notation = mac) Help, the command palette, the tour and the welcome page show shortcuts as ⌃ ⌥ ⇧ instead of Ctrl / Alt / Shift, with a note about sending Option as Meta. The tree-sitter hints now also list npm, cargo and release-binary installs in case the Homebrew formula is unavailable.
 
 ## Screenshots
 
@@ -57,7 +58,7 @@ sudo dnf install -y neovim git make gcc ripgrep nodejs tree-sitter-cli
 # Debian / Ubuntu
 sudo apt install -y neovim git make gcc ripgrep nodejs && npm i -g tree-sitter-cli
 # macOS
-brew install neovim git ripgrep node tree-sitter-cli
+brew install neovim git ripgrep node tree-sitter-cli     # if brew reports tree-sitter-cli as unavailable or deprecated: npm i -g tree-sitter-cli
 ```
 
 Check what is missing at any time with `nvim-ide/scripts/doctor.sh`.
@@ -112,7 +113,10 @@ Update with `ide update` (plugins and tools) or `bash scripts/dev.sh --update`.
 
 ## macOS notes
 
-The scripts avoid GNU-only tools, but I developed and tested this on Linux (Fedora) only, so treat macOS as untested.
+The scripts avoid GNU-only tools, but this was developed and tested on Linux (Fedora), so treat macOS as lightly tested.
+
+- Shortcuts are shown in Mac notation (⌃ ⌥ ⇧) in Help, the palette, the tour and the welcome page. Settings > Appearance > Shortcut notation switches it (`auto`, `mac`, `pc`).
+- The `tree-sitter` Homebrew formula installs only the library; the command line tool nvim-treesitter needs is `tree-sitter-cli`. If that formula is unavailable or deprecated on your Homebrew, install the CLI with `npm i -g tree-sitter-cli`, `cargo install --locked tree-sitter-cli`, or a binary from the tree-sitter GitHub releases.
 - Alt shortcuts (Alt-t, Alt-c, Alt-e ...) need the Option key to act as Meta: Terminal.app > Settings > Profiles > Keyboard > "Use Option as Meta key"; iTerm2 > Profiles > Keys > Left Option key = Esc+; kitty: `macos_option_as_alt yes`; WezTerm: `send_composed_key_when_left_alt_is_pressed = false`.
 - The launcher uses `readlink -f`, which needs macOS 12.3 or newer.
 - macOS ships bash 3.2; if a script fails, install a newer one with `brew install bash`.
@@ -151,7 +155,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/ADDING.md](docs/ADDING.md) (how
 ## Development
 
 ```sh
-bash nvim-ide/scripts/dev.sh --skip-mason --no-run                # install, 155 smoke tests, tmux render check
+bash nvim-ide/scripts/dev.sh --skip-mason --no-run                # install, 162 smoke tests, tmux render check
 python3 nvim-tui-ux/scripts/ui_lint.py --strict nvim-ide/assets/template/lua
 ```
 

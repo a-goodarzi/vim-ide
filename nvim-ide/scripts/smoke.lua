@@ -547,5 +547,21 @@ do
   check("ide update rejects an unknown mode", vim.v.shell_error == 2)
 end
 
+-- Shortcut notation: macOS symbols on a Mac (or key_style = "mac"), unchanged elsewhere
+do
+  local K = require("config.keys")
+  local was = cfg.settings.key_style
+  cfg.settings.key_style = "mac"
+  check("mac notation converts Alt, Ctrl and Shift", K.fmt("Alt-e / f / g") == "\xe2\x8c\xa5e / f / g" and K.fmt("Ctrl-Shift-p") == "\xe2\x8c\x83\xe2\x87\xa7p")
+  check("mac notation converts Alt-arrows", K.fmt("Alt-Up") == "\xe2\x8c\xa5\xe2\x86\x91")
+  require("config.help").open(); vim.wait(300)
+  local txt = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
+  check("the Help page shows mac symbols and the Option note", txt:find("\xe2\x8c\xa5", 1, true) ~= nil and txt:find("Use Option as Meta", 1, true) ~= nil and not txt:find("Alt%-e"))
+  vim.cmd("bdelete!")
+  cfg.settings.key_style = "pc"
+  check("pc notation leaves shortcuts alone", K.fmt("Alt-e / Ctrl-P") == "Alt-e / Ctrl-P")
+  cfg.settings.key_style = was
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

@@ -13,6 +13,9 @@ return {
   -- Statusline look: "rounded" (powerlevel10k-like pills), "powerline" (arrows), "plain"
   statusline_style = "rounded",
 
+  -- Shortcut notation in Help, palette and tour: "auto" (⌃ ⌥ ⇧ on a Mac, Ctrl / Alt / Shift elsewhere), "mac" or "pc"
+  key_style = "auto",
+
   -- Tab shape: "slanted" (trapezoids), "rounded" (pills) or "flat" (plain blocks)
   tabs_style = "slanted",
 

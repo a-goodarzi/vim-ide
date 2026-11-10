@@ -10,7 +10,7 @@ return {
       if vim.fn.executable("tree-sitter") == 0 then
         -- Parsers are built with the tree-sitter CLI. Say so once instead of failing for every language.
         vim.schedule(function()
-          vim.notify("nvim cannot find the tree-sitter CLI, so syntax parsers cannot be built.\nInstalled? Check `which tree-sitter` in a terminal; nvim searches:\n" .. (vim.env.PATH or ""):gsub(":", "\n  ") .. "\nNot installed: macOS brew install tree-sitter-cli, Linux see :IDEDoctor.", vim.log.levels.WARN, { title = "Treesitter" })
+          vim.notify("nvim cannot find the tree-sitter CLI, so syntax parsers cannot be built.\nInstalled? Check `which tree-sitter` in a terminal; nvim searches:\n" .. (vim.env.PATH or ""):gsub(":", "\n  ") .. "\nNot installed: macOS brew install tree-sitter-cli (or npm i -g tree-sitter-cli, or cargo install --locked tree-sitter-cli); Linux see :IDEDoctor.", vim.log.levels.WARN, { title = "Treesitter" })
         end)
       else
         pcall(function() ts.install(parsers) end)
