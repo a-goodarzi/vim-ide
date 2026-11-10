@@ -53,9 +53,21 @@ local function clear_backgrounds()
   end
 end
 
+-- Themes whose own variant is light. Everything else is dark: several plugins (gruvbox, kanagawa, everforest, catppuccin ...)
+-- pick their variant from 'background', so it must be set explicitly or a dark theme would inherit the previous light one.
+M.light = { ["tokyonight-day"] = true, ["catppuccin-latte"] = true, ["github-light"] = true, ["dayfox"] = true, ["rose-pine-dawn"] = true }
+
 --- Apply a colorscheme (lazy.nvim loads the plugin on demand). Honors the transparent setting.
 function M.apply(name)
-  local t = M.themes[name or require("config").settings.colorscheme] or M.themes.tokyonight
+  name = name or require("config").settings.colorscheme
+  vim.o.background = M.light[name] and "light" or "dark"
+  local t = M.themes[name] or M.themes.tokyonight
+  if name == "solarized-osaka" then   -- this plugin is transparent unless told otherwise: follow the Settings page instead
+    pcall(function()
+      require("lazy").load({ plugins = { "solarized-osaka.nvim" } })
+      require("solarized-osaka").setup({ transparent = require("config").settings.transparent == true })
+    end)
+  end
   local ok, err = pcall(vim.cmd.colorscheme, t[2])
   if not ok then vim.notify("Colorscheme failed: " .. tostring(err), vim.log.levels.ERROR) end
 end
@@ -64,7 +76,13 @@ function M.setup_autocmd()
   vim.api.nvim_create_autocmd("ColorScheme", { group = vim.api.nvim_create_augroup("ide-theme", { clear = true }),
     callback = function()
       if require("config").settings.transparent then clear_backgrounds() end
+      -- neo-tree derives its colours from Normal when it is set up; refresh them or the Explorer keeps the previous theme's background
+      if package.loaded["neo-tree"] then pcall(function() require("neo-tree.ui.highlights").setup() end) end
       pcall(function() require("config.ui").setup_highlights() end)
+      -- The Explorer takes the editor's background in every theme (some themes tint "sidebar" groups, which then outlive a theme switch)
+      if not require("config").settings.transparent then
+        for _, g in ipairs({ "NeoTreeNormal", "NeoTreeNormalNC", "NeoTreeEndOfBuffer" }) do vim.api.nvim_set_hl(0, g, { link = "Normal" }) end
+      end
       pcall(function() require("config.statusline").apply() end) -- statusline colors follow the colorscheme
     end })
 end

@@ -18,6 +18,17 @@ local function mix(a, b, t)
   return hex({ math.floor(x[1] + (y[1] - x[1]) * t + .5), math.floor(x[2] + (y[2] - x[2]) * t + .5), math.floor(x[3] + (y[3] - x[3]) * t + .5) })
 end
 local function get(name) return vim.api.nvim_get_hl(0, { name = name, link = false }) end
+local function lum(n)
+  local c = rgb(n)
+  local function lin(v) v = v / 255; return v <= 0.03928 and v / 12.92 or ((v + 0.055) / 1.055) ^ 2.4 end
+  return 0.2126 * lin(c[1]) + 0.7152 * lin(c[2]) + 0.0722 * lin(c[3])
+end
+local function ratio(a, b) local x, y = lum(a), lum(b); if x < y then x, y = y, x end return (x + 0.05) / (y + 0.05) end
+--- Blend `c` toward `toward` until it reads on `bg` with at least `min` contrast.
+local function ensure(c, bg, min, toward)
+  for i = 0, 10 do local x = mix(c, toward, i / 10); if ratio(x, bg) >= min then return x end end
+  return toward
+end
 
 local icon_hl = {}   -- "<fg><state>" -> group
 function M.apply()
@@ -28,13 +39,16 @@ function M.apply()
   local edge = dark and 0x000000 or 0x808080
   local fill = mix(base, edge, dark and 0.42 or 0.14)
   local idle = mix(base, edge, dark and 0.24 or 0.07)
+  if dark and lum(base) < 0.02 then   -- near-black themes: there is no room to go darker, so the strip gets lighter instead
+    fill = mix(base, 0xffffff, 0.10); idle = mix(base, 0xffffff, 0.05)
+  end
   local accent = get("Function").fg or get("DiagnosticInfo").fg or fg
-  local muted = mix(fg, idle, 0.45)
+  local muted = ensure(mix(fg, idle, 0.45), idle, 3.0, fg)
   local warn = get("DiagnosticWarn").fg or fg
   local err = get("DiagnosticError").fg or fg
   local set = function(n, v) vim.api.nvim_set_hl(0, n, v) end
   set("IDETabFill", { bg = fill, fg = muted })
-  set("IDETabTitle", { bg = fill, fg = mix(fg, fill, 0.2), bold = true })
+  set("IDETabTitle", { bg = fill, fg = ensure(mix(fg, fill, 0.2), fill, 3.0, fg), bold = true })
   set("IDETabSel", { bg = base, fg = fg, bold = true })
   set("IDETabSelPlain", { bg = base, fg = fg })
   set("IDETabSelMuted", { bg = base, fg = muted })

@@ -479,5 +479,18 @@ do
   check("command :IDETour exists", vim.fn.exists(":IDETour") == 2)
 end
 
+-- Themes: a dark theme after a light one stays dark; solarized-osaka follows the transparent setting
+do
+  local th = require("config.theme")
+  local was_t = cfg.settings.transparent; cfg.settings.transparent = false
+  th.apply("tokyonight-day"); vim.wait(200)
+  check("a light theme sets a light background", vim.o.background == "light")
+  th.apply("gruvbox"); vim.wait(200)
+  check("a dark theme after a light one is dark again", vim.o.background == "dark")
+  th.apply("solarized-osaka"); vim.wait(300)
+  check("solarized-osaka has a background when transparent is off", vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg ~= nil)
+  cfg.settings.transparent = was_t; th.apply(cfg.settings.colorscheme)
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

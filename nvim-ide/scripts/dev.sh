@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One-shot development script: install the config, link `ide`, sync plugins, install Mason tools,
-# run smoke tests and a tmux render check.   Usage: scripts/dev.sh [--name nvim-ide] [--copy] [--skip-mason] [--skip-tmux] [--no-run] [--update]
+# run smoke tests and a tmux render check.   Usage: scripts/dev.sh [--name nvim-ide] [--copy] [--skip-mason] [--skip-tmux] [--themes] [--no-run] [--update]
 # --update: also git pull (if a git checkout), update all plugins (refreshes lazy-lock.json) and Mason tools.
 # Default: ~/.config/<name> is a SYMLINK to assets/template, so edits in the repo are live (restart nvim). --copy installs a copy instead.
 # Never uses sudo; missing system packages are printed with the command to install them.
@@ -8,9 +8,9 @@ set -uo pipefail
 # Plugin repos are public: never let git open a credential dialog (askpass) or prompt.
 export GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=true SSH_ASKPASS_REQUIRE=never
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
-NAME="nvim-ide"; MASON=1; TMUXT=1; COPY=0; RUN=1; UPDATE=0
+THEMES=0; NAME="nvim-ide"; MASON=1; TMUXT=1; COPY=0; RUN=1; UPDATE=0
 while [[ $# -gt 0 ]]; do case "$1" in
-  --name) NAME="$2"; shift 2;; --copy) COPY=1; shift;; --no-run) RUN=0; shift;; --update) UPDATE=1; shift;; --skip-mason) MASON=0; shift;; --skip-tmux) TMUXT=0; shift;;
+  --name) NAME="$2"; shift 2;; --copy) COPY=1; shift;; --no-run) RUN=0; shift;; --update) UPDATE=1; shift;; --skip-mason) MASON=0; shift;; --skip-tmux) TMUXT=0; shift;; --themes) THEMES=1; shift;;
   -h|--help) sed -n '2,4p' "$0"; exit 0;; *) echo "unknown option $1"; exit 2;; esac; done
 TARGET="${XDG_CONFIG_HOME:-$HOME/.config}/$NAME"
 export NVIM_APPNAME="$NAME"
@@ -82,6 +82,11 @@ else step "4/6 Mason skipped"; fi
 step "5/6 smoke tests"
 printf 'def f(x):\n    return x + 1\n' > /tmp/ide-smoke.py
 timeout 120 nvim --headless -c "luafile $HERE/scripts/smoke.lua" 2>&1 | grep -vE "^\[nvim-treesitter" ; [[ ${PIPESTATUS[0]} -eq 0 ]] || rc=1
+
+if ((THEMES)); then
+  step "contrast check of all themes"
+  nvim --headless -c "luafile $HERE/scripts/theme_check.lua" 2>&1 | grep -vE "^\[nvim-treesitter" || rc=1
+fi
 
 if ((TMUXT)) && have tmux; then
   step "6/6 tmux render check"

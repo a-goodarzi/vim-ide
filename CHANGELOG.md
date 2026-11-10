@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.17.0 - Theme contrast check
+
+`scripts/theme_check.lua` (or `dev.sh --themes`) measures contrast for all 29 themes. Fixes it found: dark themes no longer inherit the previous light variant, idle tab text is always readable, near-black themes get a visible tab strip, solarized-osaka follows the transparent setting and the Explorer keeps the editor background after a live theme switch.
+
 ## 0.16.0 - Guided tour
 
 `:IDETour` (palette, or key t on the welcome page) walks through the activity bar, tabs, editor, command palette and statusline with five short callouts.

@@ -26,6 +26,7 @@ works inside tmux, and every screen shares one design system.
 - **Smarter command palette:** The palette lists recently used entries first and adds your project tasks, recent projects, git actions and one entry per theme.
 - **Right-click menus:** Right-click in the editor or on an Explorer entry opens a context menu (definition, references, rename, format, clipboard, Claude, split; open, new, rename, delete, copy path, terminal here). One shared menu widget now also powers the tab menu. Also fixes a late Source Control refresh overwriting a newer one.
 - **Guided tour:** `:IDETour` (palette, or key t on the welcome page) walks through the activity bar, tabs, editor, command palette and statusline with five short callouts.
+- **Theme contrast check:** `scripts/theme_check.lua` (or `dev.sh --themes`) measures contrast for all 29 themes. Fixes it found: dark themes no longer inherit the previous light variant, idle tab text is always readable, near-black themes get a visible tab strip, solarized-osaka follows the transparent setting and the Explorer keeps the editor background after a live theme switch.
 
 ## Screenshots
 
