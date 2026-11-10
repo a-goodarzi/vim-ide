@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.30.3 - Typing in the Claude panel
+
+Entering the Claude panel (click, Alt-hjkl, :wincmd) now switches the terminal to insert mode, so typing goes to Claude and is not read as Vim normal-mode keys.
+
 ## 0.30.2 - Smoke test fix
 
 The absolute-path check for the Claude command now accepts the shell-quoted path. No behaviour change.

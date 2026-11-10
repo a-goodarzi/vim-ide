@@ -686,5 +686,13 @@ do
   end
 end
 
+do -- focusing the Claude panel enters insert mode (a real terminal cannot be driven from -l, so check the hook is there)
+  local found = false
+  for _, a in ipairs(vim.api.nvim_get_autocmds({ group = "ide", event = "WinEnter" })) do
+    if a.callback then found = true end
+  end
+  check("an autocmd starts insert mode when the Claude terminal is entered", found)
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")
