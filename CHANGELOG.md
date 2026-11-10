@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0 - Tab features
+
+Right-click a tab for pin, move, close others / to the right, copy path and reveal in Explorer. Alt-< / Alt-> move a tab; Shift-h / Shift-l follow the tab order.
+
 ## 0.5.0 - Session restore and recent projects
 
 Quitting saves the open files per folder and `ide` reopens them. Palette > Recent projects (and the dashboard `o` key) switches folders.

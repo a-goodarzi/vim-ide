@@ -362,5 +362,26 @@ do
   check("command :IDEProjects exists", vim.fn.exists(":IDEProjects") == 2)
 end
 
+-- Tab features: pin, order, step, right-click menu
+do
+  local pd = vim.fn.tempname(); vim.fn.mkdir(pd, "p")
+  vim.fn.writefile({ "1" }, pd .. "/one.txt"); vim.fn.writefile({ "2" }, pd .. "/two.txt")
+  local T = require("config.tabs")
+  vim.cmd("edit " .. pd .. "/one.txt"); local b1 = vim.api.nvim_get_current_buf()
+  vim.cmd("edit " .. pd .. "/two.txt"); local b2 = vim.api.nvim_get_current_buf()
+  T.toggle_pin(b2)
+  check("pinned tab is marked", T.pinned[b2] == true)
+  T.close(b2)
+  check("a pinned tab does not close", vim.api.nvim_buf_is_valid(b2) and vim.bo[b2].buflisted)
+  T.toggle_pin(b2); T.move(b2, -1)
+  check("tab move changes the order", #T.order >= 2)
+  vim.cmd("buffer " .. b1); T.step(1)
+  check("tab step goes to the next tab", vim.api.nvim_get_current_buf() ~= b1)
+  local ok_menu = pcall(T.menu, b1); vim.wait(100)
+  check("tab right-click menu opens", ok_menu and vim.api.nvim_win_get_config(0).relative ~= "")
+  vim.api.nvim_feedkeys(vim.keycode("<Esc>"), "x", false); vim.wait(100)
+  check("tab menu closes with Esc", vim.api.nvim_win_get_config(0).relative == "")
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

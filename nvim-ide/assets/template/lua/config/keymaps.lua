@@ -8,8 +8,8 @@ if not vim.env.TMUX then -- inside tmux, plugins/tmux.lua handles these so they 
   map("n", "<C-k>", "<C-w>k", "Window up")
   map("n", "<C-l>", "<C-w>l", "Window right")
 end
-map("n", "<S-h>", "<cmd>bprevious<cr>", "Prev buffer")
-map("n", "<S-l>", "<cmd>bnext<cr>", "Next buffer")
+map("n", "<S-h>", function() require("config.tabs").step(-1) end, "Prev tab")
+map("n", "<S-l>", function() require("config.tabs").step(1) end, "Next tab")
 map("n", "<leader>bo", function() require("config.tabs").close_others() end, "Close other tabs")
 map("n", "<leader>bd", function() local ok, sn = pcall(require, "snacks"); if ok then sn.bufdelete() else vim.cmd.bdelete() end end, "Close tab/buffer")
 map("n", "<leader>w", "<cmd>write<cr>", "Save")

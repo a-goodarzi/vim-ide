@@ -34,7 +34,7 @@ map("n", "<A-z>", function() vim.wo.wrap = not vim.wo.wrap end, "Toggle word wra
 -- Tabs
 map("n", "<A-w>", function() local ok, sn = pcall(require, "snacks"); if ok then sn.bufdelete() else vim.cmd.bdelete() end end, "Close tab")
 map("n", "<C-PageDown>", "<cmd>bnext<cr>", "Next tab"); map("n", "<C-PageUp>", "<cmd>bprevious<cr>", "Previous tab")
-map("n", "<A-.>", "<cmd>bnext<cr>", "Next tab"); map("n", "<A-,>", "<cmd>bprevious<cr>", "Previous tab")
+map("n", "<A-.>", function() require("config.tabs").step(1) end, "Next tab"); map("n", "<A-,>", function() require("config.tabs").step(-1) end, "Previous tab")
 
 -- Code navigation
 map("n", "<F2>", vim.lsp.buf.rename, "Rename symbol")

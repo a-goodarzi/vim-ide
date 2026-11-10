@@ -98,6 +98,7 @@ local function left_offset()
   return col or 0, title, bar
 end
 
+M.pinned, M.order = {}, {}   -- pinned[bufnr] = true; order = bufnrs in the order the user arranged them
 local function tab_list()
   local list, names = {}, {}
   for _, b in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
@@ -109,6 +110,18 @@ local function tab_list()
       list[#list + 1] = { buf = b.bufnr, name = name, path = b.name, changed = b.changed == 1, ft = ft }
     end
   end
+  -- user order (Move left / right), pinned tabs first
+  local pos, live = {}, {}
+  for _, t in ipairs(list) do live[t.buf] = true end
+  local kept = {}
+  for _, b in ipairs(M.order) do if live[b] then kept[#kept + 1] = b; pos[b] = #kept end end
+  for _, t in ipairs(list) do if not pos[t.buf] then kept[#kept + 1] = t.buf; pos[t.buf] = #kept end end
+  M.order = kept
+  for _, t in ipairs(list) do t.pinned = M.pinned[t.buf] and true or false end
+  table.sort(list, function(a, b)
+    if a.pinned ~= b.pinned then return a.pinned end
+    return pos[a.buf] < pos[b.buf]
+  end)
   for _, t in ipairs(list) do      -- two files with the same name: add the parent folder
     if names[t.name] > 1 and t.path ~= "" then t.name = vim.fn.fnamemodify(t.path, ":h:t") .. "/" .. t.name end
     t.diag = vim.diagnostic.count(t.buf)
@@ -123,13 +136,15 @@ local function goto_buf(buf)
   end
   pcall(vim.api.nvim_win_set_buf, 0, buf)
 end
-function M.close(buf)
+function M.close(buf, force)
+  if M.pinned[buf] and not force then return vim.notify("Pinned tab: unpin it first (right-click the tab)", vim.log.levels.INFO) end
   local ok, sn = pcall(require, "snacks")
   if ok and sn.bufdelete then sn.bufdelete(buf) else pcall(vim.api.nvim_buf_delete, buf, {}) end
   vim.cmd.redrawtabline()
 end
 _G.IdeTabClick = function(buf, _, button)
-  if button == "m" then M.close(buf) elseif button == "l" then goto_buf(buf) end
+  if button == "m" then M.close(buf) elseif button == "l" then goto_buf(buf)
+  elseif button == "r" then vim.schedule(function() M.menu(buf) end) end
 end
 _G.IdeTabClose = function(buf) M.close(buf) end
 
@@ -160,6 +175,7 @@ function M.render()
       if errc > 0 then diag = "%#" .. (active and "IDETabSelErr" or "IDETabErr") .. "# E" .. errc; dw = 2 + #tostring(errc)
       elseif warnc > 0 then diag = "%#" .. (active and "IDETabSelWarn" or "IDETabWarn") .. "# W" .. warnc; dw = 2 + #tostring(warnc) end
       local mark = t.changed and (fancy and "\xe2\x97\x8f" or "+") or (fancy and "\xef\x80\x8d" or "x")
+      if t.pinned and not t.changed then mark = fancy and "\xef\x82\x8d" or "^" end
       local mark_hl = t.changed and (active and "IDETabSelMod" or "IDETabIdleMod") or (active and "IDETabSelMuted" or "IDETabIdle")
       local label = t.name
       -- Middle ellipsis keeps the distinguishing tail (number_1 vs number_12, extension).
@@ -202,6 +218,9 @@ end
 
 function M.setup()
   M.apply()
+  vim.keymap.set("n", "<A-<>", function() M.move(nil, -1) end, { desc = "Move tab left" })
+  vim.keymap.set("n", "<A->>", function() M.move(nil, 1) end, { desc = "Move tab right" })
+  vim.keymap.set("n", "<leader>bp", function() M.toggle_pin() end, { desc = "Pin / unpin tab" })
   vim.o.showtabline = 2
   vim.o.tabline = "%!v:lua.require'config.tabs'.render()"
   local g = vim.api.nvim_create_augroup("ide-tabs", { clear = true })
@@ -217,7 +236,89 @@ end
 --- Close every tab except the current one (unsaved ones stay).
 function M.close_others()
   local cur = vim.api.nvim_get_current_buf()
-  for _, t in ipairs(tab_list()) do if t.buf ~= cur and not t.changed then M.close(t.buf) end end
+  for _, t in ipairs(tab_list()) do if t.buf ~= cur and not t.changed and not t.pinned then M.close(t.buf) end end
+end
+
+--- Close the tabs to the right of `buf` (unsaved and pinned ones stay).
+function M.close_right(buf)
+  local seen = false
+  for _, t in ipairs(tab_list()) do
+    if seen and not t.changed and not t.pinned then M.close(t.buf) end
+    if t.buf == buf then seen = true end
+  end
+end
+
+function M.toggle_pin(buf)
+  buf = buf or vim.api.nvim_get_current_buf()
+  M.pinned[buf] = (not M.pinned[buf]) or nil
+  vim.cmd.redrawtabline()
+end
+
+--- Move a tab one place left (-1) or right (+1).
+function M.move(buf, d)
+  buf = buf or vim.api.nvim_get_current_buf()
+  local list = tab_list()
+  local idx
+  for i, t in ipairs(list) do if t.buf == buf then idx = i end end
+  local j = idx and idx + d
+  if not (j and list[j]) or list[j].pinned ~= list[idx].pinned then return end
+  M.order = {}
+  list[idx], list[j] = list[j], list[idx]
+  for _, t in ipairs(list) do M.order[#M.order + 1] = t.buf end
+  vim.cmd.redrawtabline()
+end
+
+--- Switch to the previous (-1) / next (+1) tab in the order the tab bar shows.
+function M.step(d)
+  local list, cur = tab_list(), vim.api.nvim_get_current_buf()
+  if #list == 0 then return end
+  local idx = 0
+  for i, t in ipairs(list) do if t.buf == cur then idx = i end end
+  goto_buf(list[((idx - 1 + d) % #list) + 1].buf)
+end
+
+--- Right-click menu on a tab (a small floating list at the mouse position).
+function M.menu(buf)
+  local ui = require("config.ui")
+  local path = vim.api.nvim_buf_get_name(buf)
+  local pinned = M.pinned[buf]
+  local items = {
+    { pinned and "Unpin" or "Pin", function() M.toggle_pin(buf) end },
+    { "Move left", function() M.move(buf, -1) end },
+    { "Move right", function() M.move(buf, 1) end },
+    { "Close", function() M.close(buf) end },
+    { "Close others", function() goto_buf(buf); M.close_others() end },
+    { "Close to the right", function() M.close_right(buf) end },
+  }
+  if path ~= "" then
+    items[#items + 1] = { "Copy path", function() vim.fn.setreg("+", path); vim.notify("Copied " .. path) end }
+    items[#items + 1] = { "Copy relative path", function() local r = vim.fn.fnamemodify(path, ":.");  vim.fn.setreg("+", r); vim.notify("Copied " .. r) end }
+    items[#items + 1] = { "Reveal in Explorer", function()
+      goto_buf(buf); local ab = require("config.activitybar"); if ab.active ~= "explorer" then ab.show("explorer") end
+      pcall(vim.cmd, "Neotree reveal left")
+    end }
+  end
+  local m = vim.fn.getmousepos()
+  local lines, w = {}, 0
+  for _, it in ipairs(items) do lines[#lines + 1] = "  " .. it[1] .. "  "; w = math.max(w, vim.fn.strdisplaywidth(lines[#lines])) end
+  local b = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(b, 0, -1, false, lines)
+  vim.bo[b].bufhidden = "wipe"
+  local col = math.max(0, math.min((m.screencol or 1) - 1, vim.o.columns - w - 2))
+  local win = vim.api.nvim_open_win(b, true, { relative = "editor", row = 1, col = col, width = w, height = #lines,
+    style = "minimal", border = ui.border, focusable = true, zindex = 80 })
+  ui.setwo(win, { cursorline = true, winhighlight = "NormalFloat:NormalFloat,CursorLine:Visual,FloatBorder:IDERule" })
+  local function close() if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end end
+  local function run(i) local it = items[i]; close(); if it then vim.schedule(it[2]) end end
+  local k = function(lhs, fn) vim.keymap.set("n", lhs, fn, { buffer = b, nowait = true, silent = true }) end
+  k("<CR>", function() run(vim.api.nvim_win_get_cursor(win)[1]) end)
+  k("<Esc>", close); k("q", close)
+  k("<LeftMouse>", function()
+    local p = vim.fn.getmousepos()
+    if p.winid == win then run(p.line) else close() end
+  end)
+  k("<RightMouse>", close)
+  vim.api.nvim_create_autocmd("WinLeave", { buffer = b, once = true, callback = close })
 end
 
 return M

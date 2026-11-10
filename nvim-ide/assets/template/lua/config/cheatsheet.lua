@@ -9,7 +9,7 @@ local sections = {
     { "<Space>fr", "Recent files" }, { "<Space>e", "Toggle file browser" }, { "<Space>fk", "Search all keymaps" },
     { "<Space>fc", "Search all commands" } } },
   { "Tabs & windows", {
-    { "Shift-h / Shift-l", "Previous / next tab" }, { "<Space>bb", "Pick a tab by letter" }, { "<Space>bp", "Pin tab" },
+    { "Shift-h / Shift-l", "Previous / next tab" }, { "Right-click a tab", "Menu: pin, move, close others / right, copy path, reveal" }, { "<Space>bp", "Pin / unpin tab" }, { "Alt-< / Alt->", "Move tab left / right" },
     { "<Space>bd", "Close tab" }, { "<Space>bo", "Close other tabs" }, { "Ctrl-h/j/k/l", "Move between windows (and tmux panes inside tmux)" },
     { "Alt-h/j/k/l", "Move between windows (also from terminals)" }, { "<Space><Tab><Tab>", "New tab page" },
     { "<Space><Tab>]  /  [", "Next / previous tab page" } } },
