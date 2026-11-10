@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.14.0 - Smarter command palette
+
+The palette lists recently used entries first and adds your project tasks, recent projects, git actions and one entry per theme.
+
 ## 0.13.0 - Remote and containers
 
 SSH shell, edit a remote file over scp, shell in a running container or the folder's dev container.

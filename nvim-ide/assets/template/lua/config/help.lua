@@ -31,7 +31,7 @@ local features = {
     "Alt-f or <Space>sr · <Space>sw word under cursor · <Space>sf this file only · in the panel: type search / replace / paths / flags, <Space>r replace all" },
   { "Breadcrumbs, outline, minimap, zen", "Path of the current symbol above the editor (clickable), a symbol outline, optional minimap, distraction-free mode.",
     "Click the breadcrumbs · Alt-o outline · <Space>um minimap (enable in Settings) · <Space>uz zen mode" },
-  { "Command palette", "Search and run any command, like Ctrl+Shift+P.",
+  { "Command palette", "Search and run any command, like Ctrl+Shift+P. Recently used entries come first; it also lists your project tasks, recent projects and every theme.",
     "F1 · <Space>P · Ctrl-P quick open file · <Space>o symbols in file · Ctrl-T symbols in project" },
   { "Tabs", "Every open file is a tab; the active tab is underlined.",
     "Shift-h / Shift-l switch · <Space>bb pick by letter · bp pin · bd close · bo close others" },

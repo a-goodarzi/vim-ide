@@ -55,6 +55,23 @@ function M.restore(cwd)
   return true
 end
 
+--- Folders you worked in, newest first (existing ones only).
+function M.list()
+  local out = {}
+  for _, p in ipairs(read(index_path) or {}) do if vim.uv.fs_stat(p.cwd) then out[#out + 1] = p.cwd end end
+  return out
+end
+
+--- Switch to the project at `c` (saves the current session first).
+function M.switch(c)
+  M.save()
+  vim.cmd("silent! %bwipeout")
+  vim.cmd("cd " .. vim.fn.fnameescape(c))
+  if not M.restore(c) then vim.cmd("enew") end
+  pcall(function() require("neo-tree.command").execute({ action = "show", dir = c, source = "filesystem", position = "left" }) end)
+  vim.notify("Opened " .. vim.fn.fnamemodify(c, ":~"))
+end
+
 --- Pick a recent project and switch to it.
 function M.projects()
   local idx = read(index_path) or {}

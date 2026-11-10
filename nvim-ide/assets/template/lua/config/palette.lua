@@ -88,22 +88,80 @@ if not require("config").feature("debug") then   -- Debugger switched off in Set
   M.items = keep
 end
 
+-- ── recents and dynamic entries ──────────────────────────────────────────────────────────────────
+local recent_path = vim.fn.stdpath("data") .. "/ide-palette-recent.json"
+local function read_recent()
+  local f = io.open(recent_path, "r"); if not f then return {} end
+  local ok, d = pcall(vim.json.decode, f:read("*a")); f:close()
+  return ok and type(d) == "table" and d or {}
+end
+local function remember(key)
+  local list = { key }
+  for _, k in ipairs(read_recent()) do if k ~= key and #list < 8 then list[#list + 1] = k end end
+  local f = io.open(recent_path, "w"); if f then f:write(vim.json.encode(list)); f:close() end
+end
+local function key_of(it) return it[1] .. "|" .. it[2] end
+
+--- Entries that depend on the folder and the machine: project tasks, recent projects, one per theme.
+local function dynamic()
+  local out = {}
+  local okt, tasks = pcall(function() return require("config.tasks").collect() end)
+  if okt then
+    for _, t in ipairs(tasks) do out[#out + 1] = { "Run", t.src .. ": " .. t.label, "", function() require("config.tasks").run(t) end } end
+  end
+  local okp, projs = pcall(function() return require("config.session").list() end)
+  if okp then
+    for i, c in ipairs(projs) do
+      if i > 1 and c ~= vim.fn.getcwd() then
+        out[#out + 1] = { "Project", vim.fn.fnamemodify(c, ":t") .. "  " .. vim.fn.fnamemodify(c, ":~"), "", function() require("config.session").switch(c) end }
+      end
+    end
+  end
+  local cfg = require("config")
+  for _, n in ipairs(require("config.theme").names) do
+    out[#out + 1] = { "Theme", n, n == cfg.settings.colorscheme and "current" or "", function()
+      require("config.theme").apply(n)
+      local o = cfg.load_overrides(); o.colorscheme = n; cfg.save_overrides(o); cfg.settings.colorscheme = n
+    end }
+  end
+  return out
+end
+
+--- All entries, most recently used first (shown under the group "Recent"), then the rest.
+function M.entries()
+  local all = vim.list_extend(vim.deepcopy(M.items), dynamic())
+  local by_key = {}
+  for _, it in ipairs(all) do by_key[key_of(it)] = it end
+  local head, used = {}, {}
+  for _, k in ipairs(read_recent()) do
+    local it = by_key[k]
+    if it then head[#head + 1] = { "Recent", it[2], it[3], it[4], _orig = k }; used[k] = true end
+  end
+  local rest = {}
+  for _, it in ipairs(all) do if not used[key_of(it)] then rest[#rest + 1] = it end end
+  -- the raw Vim command list stays last
+  for i, it in ipairs(rest) do
+    if it[2] == "All Vim commands..." then table.remove(rest, i); rest[#rest + 1] = it; break end
+  end
+  return vim.list_extend(head, rest)
+end
+
 function M.open()
   local ok, pickers = pcall(require, "telescope.pickers")
   if not ok then return tele("commands")() end
   local finders, conf = require("telescope.finders"), require("telescope.config").values
   local actions, state = require("telescope.actions"), require("telescope.actions.state")
   local displayer = require("telescope.pickers.entry_display").create({
-    separator = "  ", items = { { width = 8 }, { width = 30 }, { remaining = true } },
+    separator = "  ", items = { { width = 8 }, { width = 42 }, { remaining = true } },
   })
   pickers.new({}, {
     prompt_title = "Command Palette",
     finder = finders.new_table({
-      results = M.items,
+      results = M.entries(),
       entry_maker = function(it)
         return {
           value = it, ordinal = it[1] .. " " .. it[2],
-          display = function() return displayer({ { it[1], "Comment" }, it[2], { it[3], "Comment" } }) end,
+          display = function() return displayer({ { it[1], it[1] == "Recent" and "IDEKey" or "Comment" }, it[2], { it[3], "Comment" } }) end,
         }
       end,
     }),
@@ -112,7 +170,11 @@ function M.open()
       actions.select_default:replace(function()
         local e = state.get_selected_entry()
         actions.close(bufnr)
-        if e then vim.schedule(function() pcall(e.value[4]) end) end
+        if e then
+          local it = e.value
+          if it[2] ~= "All Vim commands..." then remember(it._orig or key_of(it)) end
+          vim.schedule(function() pcall(it[4]) end)
+        end
       end)
       return true
     end,

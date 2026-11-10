@@ -435,5 +435,21 @@ do
   check("commands :IDERemote and :IDELayoutLoad exist", vim.fn.exists(":IDERemote") == 2 and vim.fn.exists(":IDELayoutLoad") == 2)
 end
 
+-- Smarter palette: recents first, tasks / projects / themes as entries
+do
+  local pal = require("config.palette")
+  local es = pal.entries()
+  local themes = 0
+  for _, it in ipairs(es) do if it[1] == "Theme" then themes = themes + 1 end end
+  check("palette has one entry per theme", themes == #require("config.theme").names, themes)
+  check("palette keeps the raw Vim commands last", es[#es][2] == "All Vim commands...")
+  local f = io.open(vim.fn.stdpath("data") .. "/ide-palette-recent.json", "r")
+  local keep = f and f:read("*a"); if f then f:close() end
+  local w = io.open(vim.fn.stdpath("data") .. "/ide-palette-recent.json", "w"); w:write(vim.json.encode({ "File|Save" })); w:close()
+  check("palette lists the most recently used entry first", pal.entries()[1][1] == "Recent" and pal.entries()[1][2] == "Save")
+  if keep then local r = io.open(vim.fn.stdpath("data") .. "/ide-palette-recent.json", "w"); r:write(keep); r:close()
+  else os.remove(vim.fn.stdpath("data") .. "/ide-palette-recent.json") end
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

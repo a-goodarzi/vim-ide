@@ -23,6 +23,7 @@ works inside tmux, and every screen shares one design system.
 - **Problems panel:** The Problems panel groups diagnostics by file with counts and takes focus when opened.
 - **Snippets and Claude on a selection:** Snippet browser for the current file type and an action that sends the selection or file to Claude.
 - **Remote and containers:** SSH shell, edit a remote file over scp, shell in a running container or the folder's dev container.
+- **Smarter command palette:** The palette lists recently used entries first and adds your project tasks, recent projects, git actions and one entry per theme.
 
 ## Screenshots
 
