@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: add-about-page
+expected_outcome: |
+  An About screen exists, built on the shared UI kit (config.ui page), with a command IDEAbout and a <leader>ua keymap; it shows nvim version, plugin counts and an actionable row; it uses rounded borders/roles/ui.g glyph fallbacks and passes the project's UI lint.
+context:
+  scaffold_script: place-files.sh

@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: settings-ui-and-themes
+expected_outcome: |
+  The config offers an in-editor settings UI (command and keymap) that persists choices and applies colorscheme/statusline changes without restart, and registers many additional colorschemes.

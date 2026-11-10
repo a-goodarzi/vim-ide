@@ -1,0 +1,81 @@
+-- Curated command palette (F1 · <Space>P). A short, labelled list of IDE actions; the raw
+-- Neovim command list stays one entry away ("All Vim commands...").
+local M = {}
+
+local function cmd(c) return function() vim.cmd(c) end end
+local function ab(id) return function() require("config.activitybar").show(id) end end
+local function tele(n, o) return function() require("telescope.builtin")[n](o) end end
+local function feed(k) return function() vim.api.nvim_feedkeys(vim.keycode(k), "m", false) end end
+
+-- { group, label, key hint, action }
+M.items = {
+  { "File", "Quick open file", "Ctrl-P", tele("find_files") },
+  { "File", "Recent files", "<Space>fr", tele("oldfiles") },
+  { "File", "Save", "Ctrl-S", cmd("write") },
+  { "File", "Save all", "", cmd("wall") },
+  { "File", "New file", "", cmd("enew") },
+  { "File", "Close tab", "<Space>bd", cmd("bdelete") },
+  { "File", "Close other tabs", "<Space>bo", function() require("config.tabs").close_others() end },
+  { "File", "Quit", "", cmd("qa") },
+  { "Search", "Search text in files", "<Space>fg", tele("live_grep") },
+  { "Search", "Search & Replace sidebar", "Alt-f", ab("search") },
+  { "Search", "Go to symbol in file", "<Space>o", tele("lsp_document_symbols") },
+  { "Search", "Go to symbol in project", "Ctrl-T", tele("lsp_dynamic_workspace_symbols") },
+  { "Search", "Help tags", "", tele("help_tags") },
+  { "View", "Explorer", "Alt-e", ab("explorer") },
+  { "View", "Source Control", "Alt-g", ab("git") },
+  { "View", "Run & Debug", "Alt-d", ab("debug") },
+  { "View", "Outline", "Alt-o", ab("outline") },
+  { "View", "Plugins", "Alt-x", ab("plugins") },
+  { "View", "Toggle sidebar", "Alt-b", function() require("config.activitybar").toggle() end },
+  { "View", "Problems panel", "Alt-p", cmd("Trouble diagnostics toggle") },
+  { "View", "Zen mode", "", cmd("ZenMode") },
+  { "View", "Change colour theme", "<Space>uC", tele("colorscheme", { enable_preview = true }) },
+  { "Tools", "Open terminal panel", "Alt-t", cmd("ToggleTerm direction=horizontal") },
+  { "Tools", "Claude Code panel", "Alt-c", cmd("ClaudeCode") },
+  { "Tools", "Settings", "<Space>us", cmd("IDESettings") },
+  { "Tools", "Help and shortcuts", "<Space>?", cmd("IDEHelp") },
+  { "Tools", "Mason (language servers)", "", cmd("Mason") },
+  { "Tools", "Plugin manager (Lazy)", "", cmd("Lazy") },
+  { "Code", "Rename symbol", "F2", function() vim.lsp.buf.rename() end },
+  { "Code", "Go to definition", "F12", function() vim.lsp.buf.definition() end },
+  { "Code", "Find references", "Shift-F12", function() vim.lsp.buf.references() end },
+  { "Code", "Code action", "<Space>ca", function() vim.lsp.buf.code_action() end },
+  { "Code", "Format file", "<Space>cf", function() require("conform").format({ lsp_format = "fallback" }) end },
+  { "Debug", "Start / continue", "F5", feed("<F5>") },
+  { "Debug", "Toggle breakpoint", "F9", feed("<F9>") },
+  { "", "All Vim commands...", "", tele("commands") },
+}
+
+function M.open()
+  local ok, pickers = pcall(require, "telescope.pickers")
+  if not ok then return tele("commands")() end
+  local finders, conf = require("telescope.finders"), require("telescope.config").values
+  local actions, state = require("telescope.actions"), require("telescope.actions.state")
+  local displayer = require("telescope.pickers.entry_display").create({
+    separator = "  ", items = { { width = 8 }, { width = 30 }, { remaining = true } },
+  })
+  pickers.new({}, {
+    prompt_title = "Command Palette",
+    finder = finders.new_table({
+      results = M.items,
+      entry_maker = function(it)
+        return {
+          value = it, ordinal = it[1] .. " " .. it[2],
+          display = function() return displayer({ { it[1], "Comment" }, it[2], { it[3], "Comment" } }) end,
+        }
+      end,
+    }),
+    sorter = conf.generic_sorter({}),
+    attach_mappings = function(bufnr)
+      actions.select_default:replace(function()
+        local e = state.get_selected_entry()
+        actions.close(bufnr)
+        if e then vim.schedule(function() pcall(e.value[4]) end) end
+      end)
+      return true
+    end,
+  }):find()
+end
+
+return M

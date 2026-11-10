@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: unify-popups
+expected_outcome: |
+  Third-party UIs (lazy, telescope, which-key, mason, blink) get consistent rounded borders and titled panes, and highlight groups link to shared roles instead of raw colors.
+context:
+  scaffold_script: place-files.sh
