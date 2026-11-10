@@ -26,7 +26,16 @@ local views = {
     open = function() vim.cmd("AerialOpen! left") end, close = function() pcall(vim.cmd, "AerialClose") end },
   { id = "plugins", glyph = "\xef\x84\xae", ascii = "P", tip = "Plugins (lazy.nvim)",
     open = function() require("config.plugins_ui").open() end,
-    close = function() end },
+    close = function() end,
+    -- Clicking the active Plugins icon again closes the page (the other views hide their sidebar the same way).
+    toggle_off = function()
+      for _, b in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.bo[b].filetype == "ide-plugins" then
+          local ok, sn = pcall(require, "snacks")
+          if ok and sn.bufdelete then sn.bufdelete(b) else pcall(vim.api.nvim_buf_delete, b, { force = true }) end
+        end
+      end
+    end },
 }
 -- Features switched off in Settings leave no icon behind.
 if not require("config").feature("debug") then
@@ -65,7 +74,10 @@ function M.show(id)
   end
   local keep = vim.api.nvim_get_current_win()
   if M.active and by_id[M.active] then pcall(by_id[M.active].close) end
-  if M.active == id then M.active = nil; highlight(); return end
+  if M.active == id then
+    if v.toggle_off then pcall(v.toggle_off) end
+    M.active = nil; highlight(); return
+  end
   M.active = id
   pcall(v.open)
   keep_leftmost(); M.fix_sidebar(id); highlight()
@@ -109,7 +121,12 @@ function M.sync()
       if v then found = v; break end
     end
   end
-  if found then M.active = found elseif M.active and M.active ~= "plugins" then M.active = nil end
+  if found then M.active = found
+  elseif M.active == "plugins" then
+    local shown = false      -- the Plugins page is not a sidebar: it is "active" only while a window shows it
+    for _, w in ipairs(vim.api.nvim_list_wins()) do if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == "ide-plugins" then shown = true end end
+    if not shown then M.active = nil end
+  elseif M.active then M.active = nil end
   if vim.api.nvim_win_get_position(M.win)[2] ~= 0 then keep_leftmost() end
   if M.active then M.fix_sidebar(); vim.defer_fn(function() if M.active then M.fix_sidebar() end end, 80) -- aerial sizes itself late
   else pcall(vim.api.nvim_win_set_width, M.win, 4) end

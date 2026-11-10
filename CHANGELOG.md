@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.19.0 - Small fixes
+
+Clicking the active Plugins icon closes the Plugins page like the other views hide their sidebar, and the minimap steps aside for full-screen pages (Settings, Help, Plugins) instead of drawing over them.
+
 ## 0.18.0 - Tab style option
 
 Settings > Appearance > Tab style switches the tab bar between slanted (trapezoids), rounded (pills) and flat (plain blocks), live.

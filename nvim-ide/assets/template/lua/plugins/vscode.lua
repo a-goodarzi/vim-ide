@@ -61,15 +61,18 @@ return {
       local map = require("mini.map")
       map.setup({ integrations = { map.gen_integration.builtin_search(), map.gen_integration.diagnostic(), map.gen_integration.gitsigns() },
         symbols = { encode = map.gen_encode_symbols.dot("4x2") }, window = { width = 12, winblend = 30 } })
-      map.open()
-      -- The minimap is a float pinned to the screen's right edge; it would cover the Claude panel, so step aside while
-      -- that panel is open and come back when it closes (only if we were the ones who hid it).
+      if not vim.env.IDE_SETTINGS_ONLY then map.open() end   -- `ide settings` / `ide help` are full-screen pages: no minimap
+      -- The minimap is a float pinned to the screen's right edge; it would cover the Claude panel and full-screen pages
+      -- (Settings, Help, Plugins...), so step aside while one is visible and come back when it closes (only if we hid it).
       local hidden = false
       vim.api.nvim_create_autocmd({ "WinNew", "WinClosed", "TermOpen", "BufWinEnter" }, { group = vim.api.nvim_create_augroup("ide-minimap-claude", { clear = true }),
         callback = function() vim.schedule(function()
           local claude = false
           for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-            if vim.api.nvim_win_get_config(w).relative == "" and vim.bo[vim.api.nvim_win_get_buf(w)].filetype == "snacks_terminal" then claude = true end
+            if vim.api.nvim_win_get_config(w).relative == "" then
+              local ft = vim.bo[vim.api.nvim_win_get_buf(w)].filetype
+              if ft == "snacks_terminal" or (ft:find("^ide%-") and ft ~= "ide-activity") then claude = true end
+            end
           end
           local open = map.current.win_data[vim.api.nvim_get_current_tabpage()] ~= nil
           if claude and open then hidden = true; pcall(map.close)

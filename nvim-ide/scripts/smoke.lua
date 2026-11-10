@@ -506,5 +506,18 @@ do
   cfg.settings.tabs_style = was
 end
 
+-- Known issues fixed: the Plugins icon toggles its page off; the minimap steps aside for pages
+do
+  local ABp = require("config.activitybar")
+  vim.cmd("only"); vim.cmd("enew")
+  ABp.setup(); vim.wait(600)
+  ABp.show("plugins"); vim.wait(500)
+  local function plugin_win() for _, w in ipairs(vim.api.nvim_list_wins()) do if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == "ide-plugins" then return true end end return false end
+  check("Plugins icon opens the Plugins page", plugin_win() and ABp.active == "plugins")
+  ABp.show("plugins"); vim.wait(500)
+  check("clicking the active Plugins icon closes the page", not plugin_win() and ABp.active == nil)
+  vim.cmd("only")
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")
