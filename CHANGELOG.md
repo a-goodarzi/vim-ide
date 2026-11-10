@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 - Session restore and recent projects
+
+Quitting saves the open files per folder and `ide` reopens them. Palette > Recent projects (and the dashboard `o` key) switches folders.
+
 ## 0.4.0 - First-run welcome and doctor
 
 A welcome page on the first start (icon check, tool check, first keys) and `:IDEDoctor`, which lists missing tools with the exact install command for your system.

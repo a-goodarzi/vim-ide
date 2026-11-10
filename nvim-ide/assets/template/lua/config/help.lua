@@ -9,6 +9,8 @@ local features = {
     "<Space>e toggle · in the tree: a add · d delete · r rename · c copy · m move · H show hidden · ? tree help" },
   { "Source Control", "Sidebar with branch, commit box, staged / changed / untracked files. Click a file for its diff, + - x to stage / unstage / discard, buttons to commit, pull, push.",
     "Alt-g · s u x on a file · S U all · m message · c commit · p push · P pull · b branches · ? lists the keys" },
+  { "Sessions and projects", "Quitting remembers the open files and cursor lines per folder; `ide` in that folder reopens them. Recent projects switches folders.",
+    "palette: Recent projects · dashboard o · :IDESessionSave · Settings > Features > Restore last session" },
   { "Doctor and welcome", "A first-run welcome checks that icons render, runs the doctor and lists the first keys. The doctor shows missing tools with the exact install command.",
     ":IDEWelcome · :IDEDoctor · palette: Doctor" },
   { "Activity bar (VS Code layout)", "Icon column on the far left switches the sidebar: Explorer, Search & Replace, Source Control, Run & Debug, Outline, Plugins.",

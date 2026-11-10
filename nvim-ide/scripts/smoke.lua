@@ -350,5 +350,17 @@ do
   vim.cmd("enew")
 end
 
+-- Session restore: save and restore a file list
+do
+  local pd = vim.fn.tempname(); vim.fn.mkdir(pd, "p")
+  vim.fn.writefile({ "1" }, pd .. "/one.txt"); vim.fn.writefile({ "2" }, pd .. "/two.txt")
+  vim.cmd("cd " .. vim.fn.fnameescape(pd)); vim.cmd("edit one.txt"); vim.cmd("edit two.txt")
+  local S = require("config.session")
+  check("session saves open files", S.save() == true)
+  vim.cmd("silent! %bwipeout!"); vim.cmd("enew")
+  check("session restores them", S.restore() == true and vim.fn.bufnr(pd .. "/one.txt") > 0)
+  check("command :IDEProjects exists", vim.fn.exists(":IDEProjects") == 2)
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

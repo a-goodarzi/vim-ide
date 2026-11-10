@@ -36,6 +36,7 @@ local sections = {
   { "Debug & test", {
     { "<Space>db", "Breakpoint" }, { "<Space>dc", "Continue / start" }, { "<Space>di / do / dO", "Step into / over / out" },
     { "<Space>du", "Debug UI" }, { "<Space>tn / tf", "Run nearest / file tests" }, { "<Space>ts", "Test summary" } } },
+  { "Sessions & projects", { { "palette: Recent projects", "Switch project (files reopen on start)" }, { ":IDESessionSave", "Save the session now" } } },
   { "Terminal", { { "Ctrl-\\", "Floating terminal" }, { "Alt-t / <Space>tt", "Terminal panel (also the top-right button)" } } },
   { "Settings & plugins", {
     { "<Space>us / click ⚙ top-right", "Settings tab (headlines, toggles, search with /)" }, { "<Space>?", "This help" },

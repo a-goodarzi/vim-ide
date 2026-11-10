@@ -11,6 +11,7 @@ local function dashboard_keys()
     { icon = i("\xef\x85\x9b ", ""), key = "n", desc = "New file", action = ":enew" },
     { icon = i("\xef\x80\xa2 ", ""), key = "g", desc = "Grep text", action = ":Telescope live_grep" },
     { icon = i("\xef\x83\x85 ", ""), key = "r", desc = "Recent files", action = ":Telescope oldfiles" },
+    { icon = i("\xef\x81\xbb ", ""), key = "o", desc = "Recent projects", action = ":IDEProjects", enabled = cfg.feature("session_restore") },
     { icon = i("\xef\x81\xa9 ", ""), key = "c", desc = "Claude Code", action = ":ClaudeCode", enabled = cfg.feature("claude") },
     { icon = i("\xef\x90\xa3 ", ""), key = "s", desc = "Settings page", action = ":IDESettings" },
     { icon = i("\xef\x84\x9c ", ""), key = "?", desc = "Commands & shortcuts", action = ":IDEHelp" },

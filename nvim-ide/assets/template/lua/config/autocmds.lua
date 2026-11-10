@@ -60,6 +60,16 @@ end
 vim.api.nvim_create_user_command("IDEDoctor", function() require("config.doctor").open() end, { desc = "Check the tools the IDE needs" })
 vim.api.nvim_create_user_command("IDEWelcome", function() require("config.welcome").open() end, { desc = "Open the welcome / first-run check" })
 
+-- Session restore + recent projects. Commands of lazily loaded modules get a stub: the first call loads the module (which
+-- redefines the command) and repeats it.
+local function lazycmd(name, mod, nargs)
+  vim.api.nvim_create_user_command(name, function(o) require(mod); vim.cmd(name .. " " .. o.args) end, { nargs = nargs or 0 })
+end
+for _, n in ipairs({ "IDESessionSave", "IDESessionRestore", "IDEProjects" }) do lazycmd(n, "config.session") end
+if require("config").feature("session_restore") and not standalone then
+  vim.api.nvim_create_autocmd("VimEnter", { group = group, once = true, callback = function() require("config.session").setup() end })
+end
+
 -- Statusline (config/statusline.lua)
 vim.api.nvim_create_autocmd("VimEnter", { group = group, once = true, callback = function()
   vim.schedule(function() require("config.statusline").setup() end)

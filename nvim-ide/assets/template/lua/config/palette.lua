@@ -17,6 +17,8 @@ M.items = {
   { "File", "Close tab", "<Space>bd", cmd("bdelete") },
   { "File", "Close other tabs", "<Space>bo", function() require("config.tabs").close_others() end },
   { "File", "Quit", "", cmd("qa") },
+  { "File", "Recent projects...", "", cmd("IDEProjects") },
+  { "File", "Save session now", "", cmd("IDESessionSave") },
   { "Search", "Search text in files", "<Space>fg", tele("live_grep") },
   { "Search", "Search & Replace sidebar", "Alt-f", ab("search") },
   { "Search", "Go to symbol in file", "<Space>o", tele("lsp_document_symbols") },
