@@ -87,6 +87,9 @@ lazycmd("IDERemote", "config.remote"); lazycmd("IDEContainers", "config.remote")
 -- Safe updates
 lazycmd("IDEUpdateReport", "config.updater"); lazycmd("IDERollback", "config.updater")
 
+-- Claude activity log
+lazycmd("IDEAgent", "config.agent")
+
 -- Guided tour
 lazycmd("IDETour", "config.tour")
 

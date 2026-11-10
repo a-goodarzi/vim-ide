@@ -578,5 +578,45 @@ do
   check("the extra_path setting is applied", type(P.apply_extra) == "function")
 end
 
+-- Agent status: hook settings, hook script, event handling and the spool watcher
+do
+  local A = require("config.agent")
+  local js = vim.json.decode(A.settings_json())
+  check("agent settings carry the hooks", js.hooks and js.hooks.Stop and js.hooks.Notification and js.hooks.UserPromptSubmit and js.hooks.PreToolUse)
+  check("agent command passes the spool and settings", A.command():find("IDE_AGENT_SPOOL=", 1, true) ~= nil and A.command():find("--settings", 1, true) ~= nil)
+  check("the hook script is executable", vim.fn.executable(A.hook_path()) == 1)
+  -- the hook script appends the event to the spool
+  local spool = vim.fn.tempname()
+  vim.fn.system({ "bash", "-c", "printf '%s' '{\"hook_event_name\":\"Stop\"}' | IDE_AGENT_SPOOL=" .. spool .. " " .. A.hook_path() })
+  local lines = vim.fn.readfile(spool)
+  check("the hook script writes one timestamped line per event", #lines == 1 and lines[1]:match("^%d+\t{") ~= nil, vim.inspect(lines))
+  vim.fn.system({ "bash", "-c", "echo '{}' | env -u IDE_AGENT_SPOOL " .. A.hook_path() })
+  check("the hook script does nothing outside the IDE", vim.v.shell_error == 0)
+  -- state machine
+  local real_notify, notes = vim.notify, {}
+  vim.notify = function(m) notes[#notes + 1] = m end
+  A.handle("100\t" .. vim.json.encode({ hook_event_name = "UserPromptSubmit" }))
+  check("a prompt makes the status working", A.state.status == "working")
+  A.handle("101\t" .. vim.json.encode({ hook_event_name = "PreToolUse", tool_name = "Edit" }))
+  check("a tool call shows the tool name", A.state.tool == "Edit")
+  A.handle("102\t" .. vim.json.encode({ hook_event_name = "Notification", notification_type = "permission_prompt", message = "Claude needs your permission to use Bash" }))
+  check("a permission prompt means waiting and notifies", A.state.status == "waiting" and #notes == 1 and notes[1]:find("needs you", 1, true) ~= nil)
+  A.handle("103\t" .. vim.json.encode({ hook_event_name = "Stop", last_assistant_message = "All done.\nSecond line" }))
+  check("stop means done with a short message", A.state.status == "done" and A.state.message == "All done. Second line" and #notes == 2)
+  A.handle("104\t" .. vim.json.encode({ hook_event_name = "SessionEnd" }))
+  check("session end clears the status", A.state.status == "none")
+  vim.notify = real_notify
+  check("the statusline segment shows a finished session", (function() A.state.status, A.state.since = "done", os.time(); local s = A.segment(true, { pos = 1, warn = 2, lsp = 3 }); A.state.status = "none"; return s ~= nil and s.text:find("done", 1, true) ~= nil end)())
+  -- the watcher picks up lines appended to the real spool
+  A.start()
+  local f = io.open(A.spool, "a"); f:write("200\t" .. vim.json.encode({ hook_event_name = "UserPromptSubmit" }) .. "\n"); f:close()
+  vim.wait(2000, function() return A.state.status == "working" end)
+  check("the spool watcher applies appended events", A.state.status == "working")
+  A.state.status = "none"
+  vim.cmd("IDEAgent"); vim.wait(200)
+  check("the activity log page opens", vim.bo.filetype == "ide-agent")
+  vim.cmd("bdelete!")
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

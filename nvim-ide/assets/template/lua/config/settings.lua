@@ -36,6 +36,7 @@ return {
     minimap = false,       -- code minimap on the right
     tabs = true,           -- tab bar (config/tabs.lua): open files shown as tabs
     explorer_on_start = true, -- open the file browser sidebar at launch
+    agent_status = true,   -- show what Claude is doing in the statusline and notify when it needs you or is done (hooks)
     context_menu = true,   -- right-click menus in the editor and the Explorer
     session_restore = true, -- reopen the last session's files when you start `ide` in a folder with no file argument
     welcome = true,        -- show the first-run welcome (icon check, doctor, first keys) once
@@ -55,6 +56,7 @@ return {
     side = "right",        -- "right" | "left"
     width = 0.35,          -- fraction of the screen
     autostart = false,     -- open the Claude panel every time nvim starts (or run `ide claude`)
+    notify = true,         -- toast when Claude needs you (permission, question) or has finished
     terminal_cmd = nil,    -- e.g. "~/.claude/local/claude" if `claude` is not on PATH
   },
 

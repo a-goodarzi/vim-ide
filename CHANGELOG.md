@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.28.0 - Agent status
+
+The statusline shows what Claude Code is doing (working with the tool name, needs you, done) and a toast appears when it needs a permission or has finished. The IDE starts Claude with hooks passed through --settings (your own settings file is untouched); :IDEAgent shows the activity log. Verified against the real claude CLI.
+
 ## 0.27.0 - Bigger icons
 
 Settings > Appearance > Icon size (default large): the activity bar uses 4-row tiles with a filled active tile and a colour per view, and icons get room after them in the tab bar so a wide glyph can grow. For the largest icons use a Nerd Font variant without "Mono" in its name (a terminal draws text on a grid, so the font decides the glyph size).

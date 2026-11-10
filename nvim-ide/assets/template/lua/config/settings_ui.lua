@@ -48,6 +48,8 @@ local schema = {
 
   { section = "Claude Code" },
   { key = "features.claude", type = "bool", label = "Enable Claude panel", desc = "Embedded Claude Code (needs the claude CLI)", restart = true },
+  { key = "features.agent_status", type = "bool", label = "Agent status", desc = "Show what Claude is doing in the statusline (working, needs you, done) through Claude Code hooks; :IDEAgent shows the log", restart = true },
+  { key = "claude.notify", type = "bool", label = "Notify me", desc = "A toast when Claude needs you (permission, question) or has finished, unless you are in the Claude panel", default = true },
   { key = "claude.autostart", type = "bool", label = "Open panel at start", desc = "Or launch with `ide claude`", restart = true },
   { key = "claude.side", type = "enum", values = { "right", "left" }, label = "Panel side", desc = "Which edge the panel docks to", restart = true },
   { key = "claude.width", type = "number", label = "Panel width", desc = "Fraction of the screen, 0.1 - 0.9", restart = true, min = 0.1, max = 0.9 },

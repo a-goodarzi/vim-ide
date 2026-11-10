@@ -79,6 +79,8 @@ local function segments(icons)
   local dt, dcol = diag_text(icons)
   if dt then left[#left + 1] = { text = dt, bg = dcol, fg = P.dark } end
 
+  local ag = require("config").feature("agent_status") and require("config.agent").segment(icons, P)
+  if ag then right[#right + 1] = { text = ag.text, bg = ag.bg, fg = P.dark, bold = true } end
   local ln = lsp_name()
   if ln then right[#right + 1] = { text = (icons and G.lsp .. " " or "") .. ln, bg = P.lsp, fg = P.dark } end
   local ft = vim.bo.filetype ~= "" and vim.bo.filetype or "no ft"

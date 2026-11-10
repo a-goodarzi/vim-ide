@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Claude Code hook: forwards each event (JSON on stdin) to the IDE that started this Claude session.
+# The IDE passes the spool file in IDE_AGENT_SPOOL; outside the IDE this does nothing. It must stay fast and never fail.
+spool="${IDE_AGENT_SPOOL:-}"
+[ -n "$spool" ] || exit 0
+mkdir -p "$(dirname "$spool")" 2>/dev/null
+{ printf '%s\t' "$(date +%s)"; tr -d '\n'; printf '\n'; } >> "$spool" 2>/dev/null
+exit 0

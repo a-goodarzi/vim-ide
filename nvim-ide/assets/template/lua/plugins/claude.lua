@@ -25,7 +25,7 @@ return {
     },
     opts = function()
       return {
-        terminal_cmd = c.terminal_cmd,
+        terminal_cmd = cfg.feature("agent_status") and require("config.agent").command() or c.terminal_cmd,   -- hooks report Claude's status to the IDE
         terminal = { split_side = c.side or "right", split_width_percentage = c.width or 0.35, provider = "auto" },
       }
     end },
