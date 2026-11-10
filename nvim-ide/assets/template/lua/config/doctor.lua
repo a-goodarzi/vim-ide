@@ -3,7 +3,7 @@
 local M = {}
 local ui = require("config.ui")
 
-local function have(x) return vim.fn.executable(x) == 1 end
+local function have(x) return vim.fn.executable(x) == 1 or require("config.path").find(x) ~= nil end   -- nvim's PATH first, then the login shell's
 
 local function os_kind()
   local sys = (vim.uv or vim.loop).os_uname().sysname

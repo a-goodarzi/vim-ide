@@ -13,6 +13,9 @@ return {
   -- Statusline look: "rounded" (powerlevel10k-like pills), "powerline" (arrows), "plain"
   statusline_style = "rounded",
 
+  -- Extra folders appended to PATH for nvim (tools nvim cannot find, e.g. installed by nvm or mise): { "~/my/bin" }
+  extra_path = {},
+
   -- Shortcut notation in Help, palette and tour: "auto" (⌃ ⌥ ⇧ on a Mac, Ctrl / Alt / Shift elsewhere), "mac" or "pc"
   key_style = "auto",
 

@@ -1,6 +1,7 @@
 local cfg = require("config")
 -- nvim started from a GUI, a minimal shell or tmux may not see Homebrew, cargo or npm bins; append the usual ones (never prepended,
 -- so your own PATH order wins) so tools like tree-sitter, rg and node are found.
+require("config.path").apply_extra()
 for _, d in ipairs({ "/opt/homebrew/bin", "/opt/homebrew/sbin", "/usr/local/bin", "~/.cargo/bin", "~/.local/bin", "~/.npm-global/bin", "~/.volta/bin" }) do
   d = vim.fn.expand(d)
   if vim.fn.isdirectory(d) == 1 and not (":" .. (vim.env.PATH or "") .. ":"):find(":" .. d .. ":", 1, true) then vim.env.PATH = (vim.env.PATH or "") .. ":" .. d end

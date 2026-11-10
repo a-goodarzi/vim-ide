@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.25.1 - Find tools your shell knows
+
+When nvim cannot find a tool (tree-sitter, node, rg ...) it now asks your interactive login shell where it is (nvm, mise, asdf and custom Homebrew prefixes) and adds that folder to its PATH. A new extra_path setting lists folders by hand. The tree-sitter warning is shorter and tells you what to check.
+
 ## 0.25.0 - Mac shortcut notation
 
 On macOS (or with Settings > Appearance > Shortcut notation = mac) Help, the command palette, the tour and the welcome page show shortcuts as ⌃ ⌥ ⇧ instead of Ctrl / Alt / Shift, with a note about sending Option as Meta. The tree-sitter hints now also list npm, cargo and release-binary installs in case the Homebrew formula is unavailable.

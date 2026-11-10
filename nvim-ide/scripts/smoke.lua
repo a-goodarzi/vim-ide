@@ -563,5 +563,20 @@ do
   cfg.settings.key_style = was
 end
 
+-- Finding tools outside nvim's PATH: extra folders and the login-shell lookup
+do
+  local P = require("config.path")
+  local d = vim.fn.tempname(); vim.fn.mkdir(d, "p")
+  local tool = d .. "/faketool-xyz"
+  vim.fn.writefile({ "#!/bin/sh", "echo hi" }, tool); vim.fn.setfperm(tool, "rwxr-xr-x")
+  local fakesh = d .. "/fakesh"      -- a "shell" that prints a banner and then the tool's location, like `command -v` in a login shell
+  vim.fn.writefile({ "#!/bin/sh", "echo 'welcome banner'", "echo " .. tool }, fakesh); vim.fn.setfperm(fakesh, "rwxr-xr-x")
+  check("path.add appends an existing folder once", P.add(d) == true and P.add(d) == false)
+  vim.env.PATH = vim.env.PATH:gsub(":" .. vim.pesc(d), "")
+  check("a tool outside PATH is not found by nvim itself", vim.fn.executable("faketool-xyz") == 0)
+  check("path.find asks the login shell and puts the folder on PATH", P.find("faketool-xyz", { shell = fakesh }) == tool and vim.fn.executable("faketool-xyz") == 1)
+  check("the extra_path setting is applied", type(P.apply_extra) == "function")
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")
