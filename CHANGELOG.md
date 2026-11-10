@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.29.0 - Undo agent turns
+
+Before every prompt you send to Claude, the whole working tree is recorded as a hidden git checkpoint (refs/ide-checkpoints, newest 30; your index, branch and stash are untouched). <Space>au undoes the last agent turn (files Claude added are removed, edits and deletions are reverted, with a confirmation), :IDERedoTurn undoes the undo, :IDECheckpoints restores any checkpoint. Verified end to end with the real claude CLI.
+
 ## 0.28.0 - Agent status
 
 The statusline shows what Claude Code is doing (working with the tool name, needs you, done) and a toast appears when it needs a permission or has finished. The IDE starts Claude with hooks passed through --settings (your own settings file is untouched); :IDEAgent shows the activity log. Verified against the real claude CLI.

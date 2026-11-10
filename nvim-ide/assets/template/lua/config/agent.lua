@@ -25,7 +25,8 @@ end
 function M.command()
   M.start()
   local base = (require("config").settings.claude or {}).terminal_cmd or "claude"
-  return ("env IDE_AGENT_SPOOL=%s %s --settings %s"):format(vim.fn.shellescape(M.spool), base, vim.fn.shellescape(M.settings_json()))
+  local cp = require("config").feature("agent_checkpoints") and "IDE_AGENT_CHECKPOINT=1 " or ""
+  return ("env IDE_AGENT_SPOOL=%s %s%s --settings %s"):format(vim.fn.shellescape(M.spool), cp, base, vim.fn.shellescape(M.settings_json()))
 end
 
 local function first_line(s, n)

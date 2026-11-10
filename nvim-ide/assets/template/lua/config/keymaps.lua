@@ -68,6 +68,7 @@ map("n", "<leader>se", function() require("config.layout").equalize() end, "Equa
 map("n", "<leader>rt", "<cmd>IDETasks<cr>", "Run task...")
 map("n", "<leader>rr", "<cmd>IDETaskLast<cr>", "Run last task again")
 map("n", "<leader>cS", "<cmd>IDESnippets<cr>", "Browse snippets")
+map("n", "<leader>au", "<cmd>IDEUndoTurn<cr>", "Undo the last Claude turn")
 map({ "n", "v" }, "<leader>aq", function() require("config.assist").ask_selection() end, "Ask Claude about selection / file")
 
 -- VS Code-style shortcuts

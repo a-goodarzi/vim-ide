@@ -37,6 +37,7 @@ return {
     tabs = true,           -- tab bar (config/tabs.lua): open files shown as tabs
     explorer_on_start = true, -- open the file browser sidebar at launch
     agent_status = true,   -- show what Claude is doing in the statusline and notify when it needs you or is done (hooks)
+    agent_checkpoints = true, -- record the working tree before each Claude prompt so a turn can be undone (git refs, files untouched)
     context_menu = true,   -- right-click menus in the editor and the Explorer
     session_restore = true, -- reopen the last session's files when you start `ide` in a folder with no file argument
     welcome = true,        -- show the first-run welcome (icon check, doctor, first keys) once

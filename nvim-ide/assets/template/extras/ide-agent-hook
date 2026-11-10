@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
-# Claude Code hook: forwards each event (JSON on stdin) to the IDE that started this Claude session.
-# The IDE passes the spool file in IDE_AGENT_SPOOL; outside the IDE this does nothing. It must stay fast and never fail.
+# Claude Code hook: forwards each event (JSON on stdin) to the IDE that started this Claude session, and, when the IDE asks for it
+# (IDE_AGENT_CHECKPOINT=1), records a checkpoint of the working tree before each prompt so an agent turn can be undone.
+# Outside the IDE (no IDE_AGENT_SPOOL) this does nothing. It must stay fast and never fail.
 spool="${IDE_AGENT_SPOOL:-}"
 [ -n "$spool" ] || exit 0
+payload="$(tr -d '\n')"
 mkdir -p "$(dirname "$spool")" 2>/dev/null
-{ printf '%s\t' "$(date +%s)"; tr -d '\n'; printf '\n'; } >> "$spool" 2>/dev/null
+printf '%s\t%s\n' "$(date +%s)" "$payload" >> "$spool" 2>/dev/null
+if [ "${IDE_AGENT_CHECKPOINT:-}" = 1 ] && printf '%s' "$payload" | grep -q '"hook_event_name":"UserPromptSubmit"'; then
+  cwd="$(printf '%s' "$payload" | sed -n 's/.*"cwd":"\([^"]*\)".*/\1/p')"
+  prompt="$(printf '%s' "$payload" | sed -n 's/.*"prompt":"\([^"]\{0,60\}\).*/\1/p')"
+  [ -d "$cwd" ] && "$(dirname "$0")/ide-checkpoint" "$cwd" "agent: before \"${prompt:-a prompt}\"" >/dev/null 2>&1
+fi
 exit 0

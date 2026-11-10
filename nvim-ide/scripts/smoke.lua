@@ -618,5 +618,40 @@ do
   vim.cmd("bdelete!")
 end
 
+-- Undo agent turns: checkpoints in a scratch repository
+do
+  local CP = require("config.checkpoints")
+  local d = vim.fn.tempname(); vim.fn.mkdir(d, "p")
+  local function sh(...) return vim.fn.system({ "git", "-C", d, "-c", "user.name=t", "-c", "user.email=t@example.com", ... }) end
+  sh("init", "-q", "-b", "main")
+  vim.fn.writefile({ "one" }, d .. "/a.txt"); vim.fn.writefile({ "keep" }, d .. "/c.txt")
+  sh("add", "-A"); sh("commit", "-qm", "init")
+  vim.fn.writefile({ "my uncommitted edit" }, d .. "/a.txt")
+  local before_index = sh("status", "--porcelain")
+  local ref = CP.create(d, "agent: before \"test\"")
+  check("a checkpoint is recorded as a ref", ref ~= nil and ref:find("refs/ide-checkpoints/", 1, true) ~= nil, ref)
+  check("recording a checkpoint leaves the index and files alone", sh("status", "--porcelain") == before_index)
+  -- the agent edits a file, adds one and deletes one
+  vim.fn.writefile({ "agent edit" }, d .. "/a.txt"); vim.fn.writefile({ "new" }, d .. "/b.txt"); os.remove(d .. "/c.txt")
+  local ch = CP.changes_since(d, ref)
+  local by = {}
+  for _, c in ipairs(ch) do by[c.path] = c.status end
+  check("changes since a checkpoint list M, A and D", by["a.txt"] == "M" and by["b.txt"] == "A" and by["c.txt"] == "D", vim.inspect(by))
+  CP.restore(d, ref, { confirm = false })
+  check("restoring brings back the edited file", vim.fn.readfile(d .. "/a.txt")[1] == "my uncommitted edit")
+  check("restoring removes files the agent added", vim.uv.fs_stat(d .. "/b.txt") == nil)
+  check("restoring brings back deleted files", vim.fn.readfile(d .. "/c.txt")[1] == "keep")
+  local list = CP.list(d)
+  check("a restore records a safety checkpoint so it can be redone", list[1] and list[1].message:find("^safety") ~= nil)
+  -- the hook script checkpoints on UserPromptSubmit
+  local spool = vim.fn.tempname()
+  local payload = vim.json.encode({ hook_event_name = "UserPromptSubmit", cwd = d, prompt = "fix the bug" })
+  local n0 = #CP.list(d)
+  vim.fn.system({ "bash", "-c", "printf '%s' '" .. payload .. "' | IDE_AGENT_SPOOL=" .. spool .. " IDE_AGENT_CHECKPOINT=1 " .. require("config.agent").hook_path() })
+  local after = CP.list(d)
+  check("the hook records a checkpoint before a prompt", #after == n0 + 1 and after[1].message:find("fix the bug", 1, true) ~= nil, after[1] and after[1].message)
+  check("commands :IDEUndoTurn and :IDECheckpoints exist", vim.fn.exists(":IDEUndoTurn") == 2 and vim.fn.exists(":IDECheckpoints") == 2)
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Records the whole working tree (tracked + untracked files, honoring .gitignore) as a commit under refs/ide-checkpoints/
+# without touching your index, branch or stash. Prints the new ref. Usage: ide-checkpoint DIR MESSAGE
+# The newest 30 checkpoints are kept. Inspect them with:  git for-each-ref refs/ide-checkpoints
+dir="${1:-.}"; msg="${2:-checkpoint}"
+root="$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null)" || exit 0
+idx="$(mktemp "${TMPDIR:-/tmp}/ide-idx.XXXXXX")" || exit 0
+rm -f "$idx"; trap 'rm -f "$idx"' EXIT      # a temporary index of its own: the real one is never touched
+export GIT_INDEX_FILE="$idx"
+parent="$(git -C "$root" rev-parse -q --verify HEAD 2>/dev/null || true)"
+[ -n "$parent" ] && git -C "$root" read-tree "$parent" 2>/dev/null
+git -C "$root" add -A >/dev/null 2>&1
+tree="$(git -C "$root" write-tree 2>/dev/null)" || exit 0
+commit="$(git -C "$root" -c user.name=ide -c user.email=ide@localhost commit-tree "$tree" ${parent:+-p "$parent"} -m "$msg" 2>/dev/null)" || exit 0
+ref="refs/ide-checkpoints/$(date +%s)-$$"
+git -C "$root" update-ref "$ref" "$commit" && echo "$ref"
+git -C "$root" for-each-ref --sort=-refname --format='%(refname)' refs/ide-checkpoints | tail -n +31 | while read -r r; do git -C "$root" update-ref -d "$r"; done
+exit 0
