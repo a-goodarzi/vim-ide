@@ -85,7 +85,7 @@ timeout 120 nvim --headless -c "luafile $HERE/scripts/smoke.lua" 2>&1 | grep -vE
 
 if ((TMUXT)) && have tmux; then
   step "6/6 tmux render check"
-  S="idedev$$"; tmux new-session -d -s "$S" -x 150 -y 40 "cd $HERE && NVIM_APPNAME=$NAME nvim /tmp/ide-smoke.py"; for _ in $(seq 1 30); do sleep 1; screen=$(tmux capture-pane -t "$S" -p); grep -q "$(basename "$HERE")" <<<"$screen" && break; done
+  S="idedev$$"; tmux new-session -d -s "$S" -x 150 -y 40 "cd $HERE && IDE_NO_WELCOME=1 NVIM_APPNAME=$NAME nvim /tmp/ide-smoke.py"; for _ in $(seq 1 30); do sleep 1; screen=$(tmux capture-pane -t "$S" -p); grep -q "$(basename "$HERE")" <<<"$screen" && break; done
   sleep 2; screen=$(tmux capture-pane -t "$S" -p)
   grep -q "$(basename "$HERE")" <<<"$screen" && echo "  ok   sidebar (explorer) visible" || { echo "  FAIL sidebar not visible"; rc=1; }
   grep -q "ide-smoke.py" <<<"$screen" && echo "  ok   tab/buffer visible" || { echo "  FAIL buffer not visible"; rc=1; }

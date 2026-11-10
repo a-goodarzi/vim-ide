@@ -48,6 +48,7 @@ local schema = {
 
   { section = "Features" },
   { key = "features.git", type = "bool", label = "Git integration", desc = "Hunks, blame, diff view", restart = true },
+  { key = "features.welcome", type = "bool", label = "First-run welcome", desc = "Show the welcome / icon check on the first start (:IDEWelcome reopens it)", restart = false },
   { key = "features.debug", type = "bool", label = "Debugger (Run & Debug)", desc = "The Run & Debug sidebar icon, F5/F9/F10/F11, breakpoints and stepping. Off = lighter, no debug plugins load", restart = true },
   { key = "features.test", type = "bool", label = "Test runner", desc = "neotest: run tests from the editor", restart = true },
   { key = "features.terminal", type = "bool", label = "Terminal toggle", desc = "Floating terminal and lazygit", restart = true },

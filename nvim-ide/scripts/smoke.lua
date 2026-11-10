@@ -337,5 +337,18 @@ do
   vim.cmd("cd " .. vim.fn.fnameescape(oldcwd))
 end
 
+-- Doctor and first-run welcome
+do
+  local doc = require("config.doctor")
+  local res, cmd = doc.run()
+  check("doctor reports neovim and git", #res >= 5 and res[1].name == "Neovim" and type(cmd) == "string")
+  vim.env.IDE_WELCOME_FLAG = vim.fn.tempname()
+  require("config.welcome").open(); vim.wait(300)
+  check("welcome page opens and is marked seen", vim.bo.filetype == "ide-welcome" and vim.uv.fs_stat(vim.env.IDE_WELCOME_FLAG) ~= nil)
+  vim.cmd("IDEDoctor"); vim.wait(300)
+  check("doctor page opens", vim.bo.filetype == "ide-doctor")
+  vim.cmd("enew")
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

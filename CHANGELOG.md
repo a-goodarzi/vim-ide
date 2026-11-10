@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 - First-run welcome and doctor
+
+A welcome page on the first start (icon check, tool check, first keys) and `:IDEDoctor`, which lists missing tools with the exact install command for your system.
+
 ## 0.3.0 - Source Control sidebar
 
 A real Git panel: branch, commit box, staged / changed / untracked files, click for the diff, + - x to stage, unstage or discard, buttons for commit, pull and push, branch switching.

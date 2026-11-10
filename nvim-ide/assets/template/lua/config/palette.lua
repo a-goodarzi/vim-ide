@@ -34,6 +34,8 @@ M.items = {
   { "Tools", "Open terminal panel", "Alt-t", cmd("ToggleTerm direction=horizontal") },
   { "Tools", "Claude Code panel", "Alt-c", cmd("ClaudeCode") },
   { "Tools", "Settings", "<Space>us", cmd("IDESettings") },
+  { "Tools", "Doctor (check required tools)", "", cmd("IDEDoctor") },
+  { "Tools", "Welcome / first-run check", "", cmd("IDEWelcome") },
   { "Tools", "Help and shortcuts", "<Space>?", cmd("IDEHelp") },
   { "Tools", "Mason (language servers)", "", cmd("Mason") },
   { "Tools", "Plugin manager (Lazy)", "", cmd("Lazy") },

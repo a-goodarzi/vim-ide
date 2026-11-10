@@ -9,6 +9,8 @@ local features = {
     "<Space>e toggle · in the tree: a add · d delete · r rename · c copy · m move · H show hidden · ? tree help" },
   { "Source Control", "Sidebar with branch, commit box, staged / changed / untracked files. Click a file for its diff, + - x to stage / unstage / discard, buttons to commit, pull, push.",
     "Alt-g · s u x on a file · S U all · m message · c commit · p push · P pull · b branches · ? lists the keys" },
+  { "Doctor and welcome", "A first-run welcome checks that icons render, runs the doctor and lists the first keys. The doctor shows missing tools with the exact install command.",
+    ":IDEWelcome · :IDEDoctor · palette: Doctor" },
   { "Activity bar (VS Code layout)", "Icon column on the far left switches the sidebar: Explorer, Search & Replace, Source Control, Run & Debug, Outline, Plugins.",
     "Click an icon (click it again to hide the sidebar) · Alt-e explorer · Alt-f search · Alt-g git · Alt-d debug · Alt-o outline · Alt-x plugins · Alt-b toggle" },
   { "Search & Replace in files", "Find text across the project and replace it, with a live preview (the VS Code Search view).",

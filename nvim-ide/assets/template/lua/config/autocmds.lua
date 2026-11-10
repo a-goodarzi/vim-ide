@@ -50,6 +50,16 @@ if not standalone then
   end })
 end
 
+-- First-run welcome (once, after the layout is up)
+if not standalone then
+  vim.api.nvim_create_autocmd("VimEnter", { group = group, once = true, callback = function()
+    vim.defer_fn(function() pcall(function() require("config.welcome").maybe_show() end) end, 700)
+  end })
+end
+-- Commands that live in lazily loaded modules
+vim.api.nvim_create_user_command("IDEDoctor", function() require("config.doctor").open() end, { desc = "Check the tools the IDE needs" })
+vim.api.nvim_create_user_command("IDEWelcome", function() require("config.welcome").open() end, { desc = "Open the welcome / first-run check" })
+
 -- Statusline (config/statusline.lua)
 vim.api.nvim_create_autocmd("VimEnter", { group = group, once = true, callback = function()
   vim.schedule(function() require("config.statusline").setup() end)
