@@ -44,6 +44,12 @@ M.items = {
   { "Code", "Format file", "<Space>cf", function() require("conform").format({ lsp_format = "fallback" }) end },
   { "Debug", "Start / continue", "F5", feed("<F5>") },
   { "Debug", "Toggle breakpoint", "F9", feed("<F9>") },
+  { "Git", "Source Control sidebar", "Alt-g", ab("git") },
+  { "Git", "Commit...", "", function() require("config.scm").commit() end },
+  { "Git", "Stage all changes", "", function() require("config.scm").stage_all() end },
+  { "Git", "Push", "", function() require("config.scm").push() end },
+  { "Git", "Pull", "", function() require("config.scm").pull() end },
+  { "Git", "Switch or create branch...", "", function() require("config.scm").branches() end },
   { "", "All Vim commands...", "", tele("commands") },
 }
 if not require("config").feature("debug") then   -- Debugger switched off in Settings: no debug entries

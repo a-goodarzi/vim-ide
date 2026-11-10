@@ -57,7 +57,7 @@ end })
 
 -- Closing the last editor window must quit, not leave a sidebar (Explorer, activity bar, outline...) stretched
 -- across the whole screen.
-local sidebar_ft = { ["neo-tree"] = true, ["ide-activity"] = true, aerial = true, ["grug-far"] = true, trouble = true,
+local sidebar_ft = { ["neo-tree"] = true, ["ide-activity"] = true, idescm = true, aerial = true, ["grug-far"] = true, trouble = true,
   ["dapui_scopes"] = true, ["dapui_breakpoints"] = true, ["dapui_stacks"] = true, ["dapui_watches"] = true,
   ["dapui_console"] = true, ["dap-repl"] = true, qf = true, help = false }
 local page_ft = { ["ide-settings"] = true, ["ide-help"] = true, ["ide-plugins"] = true }

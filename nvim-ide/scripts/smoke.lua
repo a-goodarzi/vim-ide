@@ -122,7 +122,7 @@ do
   local AB2 = require("config.activitybar")
   local function wins_of(ft) local n = 0 for _, w in ipairs(vim.api.nvim_list_wins()) do if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == ft then n = n + 1 end end return n end
   local function bar_ok() return AB2.win and vim.api.nvim_win_is_valid(AB2.win) and vim.api.nvim_win_get_width(AB2.win) == 4 and vim.api.nvim_win_get_position(AB2.win)[2] == 0 end
-  vim.cmd("only"); AB2.setup(); vim.wait(600); AB2.show("git"); vim.wait(400)  -- (grug-far needs a real UI; the git view uses the same sidebar path)
+  vim.cmd("only"); AB2.setup(); vim.wait(600); if AB2.active ~= "explorer" then AB2.show("explorer") end; vim.wait(400)  -- (grug-far needs a real UI; the explorer uses the same sidebar path)
   check("sidebar next to the bar has a fixed width", (function() for _, w in ipairs(vim.api.nvim_list_wins()) do if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == "neo-tree" then return vim.api.nvim_win_get_width(w) == 34 end end end)())
   local tabs0 = #vim.api.nvim_list_tabpages()
   require("config.settings_ui").open(); vim.wait(200)

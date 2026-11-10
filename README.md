@@ -12,6 +12,7 @@ works inside tmux, and every screen shares one design system.
 - **Command palette:** F1 or `<Space>P`.
 - **Launcher:** `ide`, `ide claude`, `ide settings`, `ide help`.
 - **Debugger option:** Settings > Features > Debugger switches Run & Debug on or off: the activity-bar icon, F5/F9/F10/F11, the palette entries and the debug plugins all follow it.
+- **Source Control sidebar:** A real Git panel: branch, commit box, staged / changed / untracked files, click for the diff, + - x to stage, unstage or discard, buttons for commit, pull and push, branch switching.
 
 ## Screenshots
 

@@ -18,7 +18,7 @@ local views = {
   { id = "search", glyph = "\xef\x80\x82", ascii = "S", tip = "Search & Replace",
     open = function() require("grug-far").open({ windowCreationCommand = "topleft 50vsplit", transient = true }) end, close = closer("grug-far") },
   { id = "git", glyph = "\xee\x9c\xa5", ascii = "G", tip = "Source Control",
-    open = function() vim.cmd("Neotree show git_status left") end, close = function() pcall(vim.cmd, "Neotree close") end },
+    open = function() require("config.scm").open_panel() end, close = function() require("config.scm").close_panel() end },
   { id = "debug", glyph = "\xef\x86\x88", ascii = "D", tip = "Run & Debug",
     open = function() pcall(require, "dap") --[[ loading nvim-dap runs dapui.setup ]]; local ok, d = pcall(require, "dapui"); if ok then d.open() else vim.notify("Debugger is disabled in Settings > Features", vim.log.levels.WARN) end end,
     close = function() local ok, d = pcall(require, "dapui"); if ok and package.loaded["dap"] then d.close() end end },
@@ -71,12 +71,12 @@ function M.show(id)
   keep_leftmost(); M.fix_sidebar(id); highlight()
 end
 
-local widths = { explorer = 34, git = 34, search = 50, outline = 32, debug = 44 }
+local widths = { explorer = 34, git = 38, search = 50, outline = 32, debug = 44 }
 --- Give the sidebar next to the bar a fixed width, so opening/closing editors never reshuffles it.
 function M.fix_sidebar(id)
   id = id or M.active
   local w = widths[id]; if not (w and bar_valid()) then return end
-  local fts = { explorer = { "neo-tree" }, git = { "neo-tree" }, search = { "grug-far" }, outline = { "aerial" },
+  local fts = { explorer = { "neo-tree" }, git = { "idescm" }, search = { "grug-far" }, outline = { "aerial" },
     debug = { "dapui_scopes", "dapui_breakpoints", "dapui_stacks", "dapui_watches" } }
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_get_config(win).relative == "" and vim.tbl_contains(fts[id], vim.bo[vim.api.nvim_win_get_buf(win)].filetype) then
@@ -87,7 +87,7 @@ function M.fix_sidebar(id)
 end
 M.relayout = function() M.fix_sidebar() end
 
-local ft_view = { ["neo-tree"] = "explorer", ["grug-far"] = "search", aerial = "outline", dapui_scopes = "debug" }
+local ft_view = { ["neo-tree"] = "explorer", ["grug-far"] = "search", aerial = "outline", dapui_scopes = "debug", idescm = "git" }
 function M.sync()
   if not bar_valid() then return end
   -- Only one sidebar view at a time, whichever path opened it (<leader>e, :Neotree, :AerialToggle ...): the newest
@@ -106,7 +106,7 @@ function M.sync()
   for _, w in ipairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_get_config(w).relative == "" then
       local v = ft_view[vim.bo[vim.api.nvim_win_get_buf(w)].filetype]
-      if v then found = v; if v == "explorer" and M.active == "git" then found = "git" end break end
+      if v then found = v; break end
     end
   end
   if found then M.active = found elseif M.active and M.active ~= "plugins" then M.active = nil end
@@ -181,7 +181,7 @@ function M.setup()
   -- Sidebars can also be opened/closed by other keys (<leader>e, :Neotree, :AerialToggle ...). Re-sync the highlighted
   -- icon with what is really open and keep the bar leftmost, so no path leaves the bar stale or in the middle.
   vim.api.nvim_create_autocmd({ "WinClosed", "WinNew" }, { callback = function() vim.schedule(M.sync) end })
-  vim.api.nvim_create_autocmd("FileType", { pattern = { "neo-tree", "grug-far", "aerial", "dapui_scopes" },
+  vim.api.nvim_create_autocmd("FileType", { pattern = { "neo-tree", "grug-far", "aerial", "dapui_scopes", "idescm" },
     callback = function() vim.schedule(M.sync) end })
   -- Window navigation (Ctrl-h/j/k/l, Alt-h/j/k/l, :wincmd) can land on the bar; it is not editable, so step to the window
   -- on its right (the sidebar or the editor) instead.

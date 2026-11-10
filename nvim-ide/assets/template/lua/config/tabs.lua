@@ -6,8 +6,8 @@
 -- * colors are derived from the colorscheme, so every theme gets the same shape
 local M = {}
 
-local sidebar_titles = { ["neo-tree"] = "Explorer", ["grug-far"] = "Search & Replace", aerial = "Outline", dapui_scopes = "Run & Debug" }
-local skip_ft = { ["neo-tree"] = true, ["ide-activity"] = true, ["grug-far"] = true, aerial = true, minimap = true, qf = true,
+local sidebar_titles = { ["neo-tree"] = "Explorer", ["grug-far"] = "Search & Replace", aerial = "Outline", dapui_scopes = "Run & Debug", idescm = "Source Control" }
+local skip_ft = { ["neo-tree"] = true, ["ide-activity"] = true, ["grug-far"] = true, idescm = true, aerial = true, minimap = true, qf = true,
   trouble = true, toggleterm = true, snacks_terminal = true, dapui_scopes = true, dapui_breakpoints = true,
   dapui_stacks = true, dapui_watches = true, dapui_console = true, ["dap-repl"] = true }
 
@@ -103,7 +103,7 @@ local function tab_list()
   for _, b in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
     local ft = vim.bo[b.bufnr].filetype
     local empty = b.name == "" and b.changed == 0 and b.linecount <= 1 and #b.windows == 0
-    if not skip_ft[ft] and vim.bo[b.bufnr].buftype ~= "terminal" and not empty then
+    if not skip_ft[ft] and vim.bo[b.bufnr].buftype ~= "terminal" and not empty and not b.name:find("^%a+://") then   -- gitsigns:// diff buffers are not tabs
       local name = b.name == "" and "[No Name]" or vim.fn.fnamemodify(b.name, ":t")
       names[name] = (names[name] or 0) + 1
       list[#list + 1] = { buf = b.bufnr, name = name, path = b.name, changed = b.changed == 1, ft = ft }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0 - Source Control sidebar
+
+A real Git panel: branch, commit box, staged / changed / untracked files, click for the diff, + - x to stage, unstage or discard, buttons for commit, pull and push, branch switching.
+
 ## 0.2.0 - Debugger option
 
 Settings > Features > Debugger switches Run & Debug on or off: the activity-bar icon, F5/F9/F10/F11, the palette entries and the debug plugins all follow it.
