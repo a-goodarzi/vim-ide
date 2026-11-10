@@ -7,7 +7,7 @@ Start with `scripts/doctor.sh`, then `:checkhealth` in nvim.
 | Error mentioning `vim.lsp.config` / `vim.lsp.enable` nil | nvim < 0.11 | Upgrade nvim (AppImage / package manager / bob). |
 | No LSP in a file | Server not installed or filetype not covered | `:Mason` (is it installed?), `:LspInfo`, `:set ft?`; confirm the language is in `settings.languages`. |
 | Server installed but never attaches | Root not found (no `.git`/project file) | Open nvim from the project root; check `:LspInfo` for root dir. |
-| Treesitter errors / no highlighting | Missing `tree-sitter` CLI or C compiler (`main` branch builds parsers locally) | Install both, then `:TSUpdate`. |
+| Treesitter errors / no highlighting | Missing `tree-sitter` CLI (macOS: `brew install tree-sitter-cli`, the `tree-sitter` formula is only the library) or C compiler (`main` branch builds parsers locally) | Install both, then `:TSUpdate`. |
 | `unknown language preset` warning | Typo in `settings.languages` | Names must match keys in `languages.lua`. |
 | Garbled icons | No Nerd Font | Install one and select it in the terminal, or `features.icons = false`. |
 | Live grep does nothing | ripgrep missing | Install `ripgrep`. |

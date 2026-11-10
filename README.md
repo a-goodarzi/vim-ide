@@ -56,7 +56,7 @@ sudo dnf install -y neovim git make gcc ripgrep nodejs tree-sitter-cli
 # Debian / Ubuntu
 sudo apt install -y neovim git make gcc ripgrep nodejs && npm i -g tree-sitter-cli
 # macOS
-brew install neovim git ripgrep node tree-sitter
+brew install neovim git ripgrep node tree-sitter-cli
 ```
 
 Check what is missing at any time with `nvim-ide/scripts/doctor.sh`.

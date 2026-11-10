@@ -28,8 +28,9 @@ local PKG = {
   gcc = { brew = "gcc", dnf = "gcc", apt = "gcc", pacman = "gcc", zypper = "gcc" },
   rg = { brew = "ripgrep", dnf = "ripgrep", apt = "ripgrep", pacman = "ripgrep", zypper = "ripgrep" },
   node = { brew = "node", dnf = "nodejs", apt = "nodejs", pacman = "nodejs", zypper = "nodejs" },
-  ["tree-sitter"] = { brew = "tree-sitter", dnf = "tree-sitter-cli", pacman = "tree-sitter-cli" },
+  ["tree-sitter"] = { brew = "tree-sitter-cli", dnf = "tree-sitter-cli", pacman = "tree-sitter-cli" },
 }
+M.packages = PKG   -- exposed for the smoke test
 local INSTALL = { brew = "brew install ", dnf = "sudo dnf install -y ", apt = "sudo apt install -y ",
   pacman = "sudo pacman -S --needed ", zypper = "sudo zypper install -y ", other = "" }
 

@@ -532,5 +532,11 @@ do
   check("commands :IDERollback and :IDEUpdateReport exist", vim.fn.exists(":IDERollback") == 2 and vim.fn.exists(":IDEUpdateReport") == 2)
 end
 
+-- Doctor package names: on macOS the tree-sitter CLI is the "tree-sitter-cli" formula
+do
+  local P = require("config.doctor").packages
+  check("doctor names the tree-sitter CLI package for Homebrew", P["tree-sitter"].brew == "tree-sitter-cli" and P["tree-sitter"].dnf == "tree-sitter-cli")
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

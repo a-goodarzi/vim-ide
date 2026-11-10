@@ -7,7 +7,14 @@ return {
       ts.setup()
       local parsers = cfg.collect("parsers")
       vim.list_extend(parsers, { "regex", "diff", "gitcommit", "query" })
-      pcall(function() ts.install(parsers) end)
+      if vim.fn.executable("tree-sitter") == 0 then
+        -- Parsers are built with the tree-sitter CLI. Say so once instead of failing for every language.
+        vim.schedule(function()
+          vim.notify("The tree-sitter CLI is not installed, so syntax parsers cannot be built.\nmacOS: brew install tree-sitter-cli   Linux: see :IDEDoctor (or npm i -g tree-sitter-cli)\nThen restart nvim.", vim.log.levels.WARN, { title = "Treesitter" })
+        end)
+      else
+        pcall(function() ts.install(parsers) end)
+      end
 
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(a)

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.23.2 - macOS tree-sitter fix
+
+On macOS the tree-sitter CLI is the `tree-sitter-cli` Homebrew formula (`tree-sitter` is only the library): README, dev.sh, the doctor and the Homebrew template now say so. Without the CLI, nvim now shows one clear warning instead of an error per language.
+
 ## 0.23.1 - Documentation update
 
 README, repository layout, the nvim-ide skill and three new lessons (async sequence checks, theme background, clean-container installs) are brought up to date with 0.14 to 0.23.

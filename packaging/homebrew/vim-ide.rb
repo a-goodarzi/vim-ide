@@ -12,7 +12,7 @@ class VimIde < Formula
   depends_on "make"
   depends_on "node"
   depends_on "ripgrep"
-  depends_on "tree-sitter"
+  depends_on "tree-sitter-cli"
 
   def install
     libexec.install Dir["*"]
