@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.30.2 - Smoke test fix
+
+The absolute-path check for the Claude command now accepts the shell-quoted path. No behaviour change.
+
 ## 0.30.1 - Claude panel starts again
 
 The agent-status wrapper ran a bare `claude` through env, which fails when claude is only an alias or lives in ~/.claude/local (the panel then closed at once). It now resolves the claude binary like claudecode.nvim does (setting, PATH, ~/.claude/local, ~/.local/bin, Homebrew, npm, your login shell) and falls back to the plain panel when it cannot find it.
