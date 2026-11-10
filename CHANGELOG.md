@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.24.0 - ide update updates the IDE
+
+`ide update` now updates the IDE itself (latest release from GitHub, with the changelog of what is new), then plugins and tools; `ide update check` only looks, `ide update ide|plugins` does one half, `ide version` shows the version. Local edits block the IDE update. Also: nvim and the launcher append Homebrew, cargo and npm bin folders to PATH, so tools like tree-sitter are found even from a minimal shell, and the doctor shows the tree-sitter version.
+
 ## 0.23.2 - macOS tree-sitter fix
 
 On macOS the tree-sitter CLI is the `tree-sitter-cli` Homebrew formula (`tree-sitter` is only the library): README, dev.sh, the doctor and the Homebrew template now say so. Without the CLI, nvim now shows one clear warning instead of an error per language.

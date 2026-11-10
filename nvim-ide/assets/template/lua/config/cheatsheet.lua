@@ -51,7 +51,7 @@ local sections = {
     { "<Space>ph", "Health check" }, { "<Space>uR", "Restart nvim (reload config)" } } },
   { "From the shell (ide launcher)", {
     { "ide [files]", "Open the IDE" }, { "ide claude", "Open the IDE with the Claude panel" },
-    { "ide settings", "Full-screen settings TUI (q quits)" }, { "ide help", "Full-screen shortcuts" }, { "ide sync", "Install plugins" }, { "ide update", "Update plugins + tools (lockfile saved first)" }, { "ide rollback", "Undo the last update" } } },
+    { "ide settings", "Full-screen settings TUI (q quits)" }, { "ide help", "Full-screen shortcuts" }, { "ide sync", "Install plugins" }, { "ide update", "Update the IDE, plugins and tools" }, { "ide update check", "Is a newer IDE release out?" }, { "ide rollback", "Undo the last plugin update" } } },
   { "Handy built-ins", {
     { "gc", "Comment line / selection" }, { "gsa / gsd / gsr", "Surround add / delete / replace" },
     { "s", "Flash: jump anywhere" }, { ":w  :q  :wa", "Save / quit / save all" } } },

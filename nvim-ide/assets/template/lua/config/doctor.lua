@@ -40,7 +40,11 @@ function M.run()
   local res, mgr, pkgs, npm = {}, os_kind(), {}, {}
   local function add(level, name, detail, tool) res[#res + 1] = { level = level, name = name, detail = detail, tool = tool } end
   local function need(tool, name, level)
-    if have(tool) then return add("ok", name, "found") end
+    if have(tool) then
+      local detail = "found"
+      if tool == "tree-sitter" then detail = "found: " .. vim.trim(vim.fn.system({ "tree-sitter", "--version" })):sub(1, 40) end
+      return add("ok", name, detail)
+    end
     add(level, name, "not found", tool)
     local p = PKG[tool] and PKG[tool][mgr]
     if p then pkgs[#pkgs + 1] = p elseif tool == "tree-sitter" then npm[#npm + 1] = "tree-sitter-cli" end

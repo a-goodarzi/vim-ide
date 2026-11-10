@@ -10,7 +10,7 @@ works inside tmux, and every screen shares one design system.
 - **Languages:** Python, Go, HTML/CSS, JavaScript, Terraform, Bash, Markdown, JSON, YAML, Lua. Each has an LSP, tree-sitter, a formatter and a linter (installed through Mason).
 - **In-editor Settings and Help pages:** 29 colour themes, transparent mode, statusline style and feature toggles. They are saved outside the config, so updates don't overwrite them.
 - **Command palette:** F1 or `<Space>P`.
-- **Launcher:** `ide`, `ide claude`, `ide settings`, `ide help`, `ide update`, `ide rollback`.
+- **Launcher:** `ide`, `ide claude`, `ide settings`, `ide help`, `ide update` (the IDE itself, then plugins and tools), `ide update check`, `ide rollback`, `ide version`.
 - **Debugger option:** Settings > Features > Debugger switches Run & Debug on or off: the activity-bar icon, F5/F9/F10/F11, the palette entries and the debug plugins all follow it.
 - **Source Control sidebar:** A real Git panel: branch, commit box, staged / changed / untracked files, click for the diff, + - x to stage, unstage or discard, buttons for commit, pull and push, branch switching.
 - **First-run welcome and doctor:** A welcome page on the first start (icon check, tool check, first keys) and `:IDEDoctor`, which lists missing tools with the exact install command for your system.
@@ -29,6 +29,7 @@ works inside tmux, and every screen shares one design system.
 - **Theme contrast check:** `scripts/theme_check.lua` (or `dev.sh --themes`) measures contrast for all 29 themes. Fixes it found: dark themes no longer inherit the previous light variant, idle tab text is always readable, near-black themes get a visible tab strip, solarized-osaka follows the transparent setting and the Explorer keeps the editor background after a live theme switch.
 - **Tab style option:** Settings > Appearance > Tab style switches the tab bar between slanted (trapezoids), rounded (pills) and flat (plain blocks), live.
 - **Safe updates:** `ide update` / :IDEUpdate saves the plugin lockfile first and lists what changed (updated, added, removed); `ide rollback` / :IDERollback puts the saved lockfile back and restores those plugin versions. Verified end to end in a clean container.
+- **ide update updates the IDE:** `ide update` now updates the IDE itself (latest release from GitHub, with the changelog of what is new), then plugins and tools; `ide update check` only looks, `ide update ide|plugins` does one half, `ide version` shows the version. Local edits block the IDE update. Also: nvim and the launcher append Homebrew, cargo and npm bin folders to PATH, so tools like tree-sitter are found even from a minimal shell, and the doctor shows the tree-sitter version.
 
 ## Screenshots
 

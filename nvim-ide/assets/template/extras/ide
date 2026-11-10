@@ -1,22 +1,72 @@
 #!/usr/bin/env bash
-# ide — launcher for the nvim IDE.   ide [files…] | ide claude | ide settings | ide help | ide sync | ide update | ide rollback
+# ide — launcher for the nvim IDE.   ide [files…] | ide claude | ide settings | ide help | ide sync | ide update [check|ide|plugins] | ide rollback | ide version
 # Works from any directory; finds its own config via the symlink target (extras/ide inside the config dir).
 set -euo pipefail
-SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+# Resolve symlinks (readlink -f needs macOS 12.3+; fall back to python3).
+SELF="$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || python3 -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "${BASH_SOURCE[0]}")"
 CFG="$(dirname "$(dirname "$SELF")")"
 # App name: honor $NVIM_APPNAME / $IDE_APPNAME; running from the repo template dir means the dev setup.
 APP="${NVIM_APPNAME:-${IDE_APPNAME:-$(basename "$CFG")}}"
 [[ "$APP" == "template" ]] && APP="nvim-ide"
 export NVIM_APPNAME="$APP"
+# Homebrew, cargo and npm bins are often missing from a minimal PATH (tmux, GUI launchers): append them so tree-sitter, rg, node are found.
+for d in /opt/homebrew/bin /opt/homebrew/sbin /usr/local/bin "$HOME/.cargo/bin" "$HOME/.local/bin" "$HOME/.npm-global/bin" "$HOME/.volta/bin"; do
+  [[ -d "$d" && ":$PATH:" != *":$d:"* ]] && PATH="$PATH:$d"
+done
+export PATH
 # Headless sync/update clone public plugin repos only: never pop up a credential dialog.
 if [[ "${1:-}" == "sync" || "${1:-}" == "update" || "${1:-}" == "rollback" ]]; then export GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=true SSH_ASKPASS_REQUIRE=never; fi
+
+# ── updating the IDE itself (the git checkout the config lives in) ───────────────────────────────────
+ROOT="$(git -C "$CFG" rev-parse --show-toplevel 2>/dev/null || true)"
+LOCK="nvim-ide/assets/template/lazy-lock.json"
+self_update() {   # $1 = check | apply
+  if [[ -z "$ROOT" || ! -f "$ROOT/VERSION" ]]; then
+    echo "The IDE is not a git checkout here (installed by a package manager?). Homebrew: brew upgrade vim-ide"; return 0
+  fi
+  local cur latest branch
+  cur="$(tr -d '[:space:]' < "$ROOT/VERSION")"
+  latest="$(git -C "$ROOT" ls-remote --tags --refs --sort=-v:refname origin 'v*' 2>/dev/null | head -1 | sed 's|.*refs/tags/v||' || true)"
+  if [[ -z "$latest" ]]; then echo "IDE version $cur (could not reach the repository: offline?)"; return 0; fi
+  echo "IDE version $cur, latest release $latest"
+  if [[ "$cur" == "$latest" ]]; then echo "The IDE is up to date."; return 0; fi
+  if [[ "$1" == check ]]; then echo "A newer version is available: run  ide update"; return 0; fi
+  # Local edits block the update, except the plugin lockfile (every plugin update rewrites it).
+  if [[ -n "$(git -C "$ROOT" status --porcelain -uno -- . ":(exclude)$LOCK")" ]]; then
+    echo "You have local changes in $ROOT: commit or stash them, then run  ide update  again."; return 1
+  fi
+  git -C "$ROOT" checkout -q -- "$LOCK" 2>/dev/null || true
+  branch="$(git -C "$ROOT" symbolic-ref --short -q HEAD || true)"
+  if [[ -n "$branch" ]]; then
+    git -C "$ROOT" pull --ff-only -q origin "$branch" || { echo "Could not fast-forward $branch (diverged?). Update by hand in $ROOT."; return 1; }
+  else
+    git -C "$ROOT" fetch -q --depth 1 origin "refs/tags/v$latest:refs/tags/v$latest" 2>/dev/null && git -C "$ROOT" -c advice.detachedHead=false checkout -q "v$latest" 2>/dev/null \
+      || { echo "Could not fetch v$latest."; return 1; }
+  fi
+  echo "Updated the IDE to $(tr -d '[:space:]' < "$ROOT/VERSION"). What is new:"
+  awk -v cur="$cur" '/^## /{ if ($2==cur) exit } {print}' "$ROOT/CHANGELOG.md" 2>/dev/null | tail -n +2 | sed 's/^/  /' | head -40
+  echo "Restart nvim to use the new version."
+}
+
 case "${1:-}" in
   claude)   shift; exec nvim -c "lua vim.schedule(function() vim.cmd('ClaudeCode') end)" "$@" ;;
   settings) export IDE_SETTINGS_ONLY=1; exec nvim -c "IDESettings" ;;   # full-screen settings TUI, q quits
   help)     export IDE_SETTINGS_ONLY=1; exec nvim -c "IDEHelp" ;;
   sync)     exec nvim --headless "+Lazy! sync" +qa ;;
-  update)   exec nvim --headless "+lua require('config.updater').update_all()" +qa ;;  # saves the lockfile, updates plugins + tools, lists the changes
-  rollback) exec nvim --headless "+lua require('config.updater').rollback()" +qa ;;     # undo the last update
+  version)  echo "vim-ide ${ROOT:+$(tr -d '[:space:]' < "$ROOT/VERSION" 2>/dev/null)} ${ROOT:+($(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null))}"; nvim --version | head -1 ;;
+  update)
+    what="${2:-all}"
+    case "$what" in
+      check) self_update check; exit 0 ;;
+      ide|plugins|all) ;;
+      *) echo "usage: ide update [check|ide|plugins]"; exit 2 ;;
+    esac
+    # Save the plugin lockfile first, so `ide rollback` can undo the plugins even after the IDE itself changed.
+    nvim --headless "+lua require('config.updater').snapshot()" +qa >/dev/null 2>&1 || true
+    export IDE_LOCK_SNAPSHOTTED=1
+    if [[ "$what" != plugins ]]; then self_update apply || exit 1; fi
+    if [[ "$what" != ide ]]; then exec nvim --headless "+lua require('config.updater').update_all()" +qa; fi ;;
+  rollback) exec nvim --headless "+lua require('config.updater').rollback()" +qa ;;     # undo the last plugin update
   -h|--help) sed -n '2,3p' "$SELF"; exit 0 ;;
   *)        exec nvim "$@" ;;
 esac

@@ -76,7 +76,7 @@ end
 
 --- Snapshot, update plugins and tools, then show the changes.
 function M.update_all()
-  M.snapshot()
+  if not vim.env.IDE_LOCK_SNAPSHOTTED then M.snapshot() end   -- `ide update` already saved it before updating the IDE itself
   if #vim.api.nvim_list_uis() == 0 then
     vim.cmd("Lazy! update"); pcall(vim.cmd, "MasonToolsUpdate"); M.report()
     return

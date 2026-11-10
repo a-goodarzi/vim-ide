@@ -91,7 +91,10 @@ local commands = {
   { "ide claude", "From the shell: open the IDE with the Claude panel" },
   { "ide settings", "From the shell: full-screen settings" },
   { "ide help", "From the shell: this help" },
-  { "ide sync / ide update", "Install plugins / update plugins and tools (the lockfile is saved first and the changes are listed)" },
+  { "ide update", "Update the IDE itself (latest release from GitHub, shows what is new), then plugins and tools. The plugin lockfile is saved first and the changes are listed." },
+  { "ide update check / ide / plugins", "Only check for a newer IDE / only the IDE / only plugins and tools" },
+  { "ide version", "Show the IDE version and commit" },
+  { "ide sync", "Install missing plugins" },
   { "ide rollback / :IDERollback", "Undo the last update: restores the saved lockfile and those plugin versions" },
 }
 

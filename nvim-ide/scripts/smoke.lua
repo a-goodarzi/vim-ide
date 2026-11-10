@@ -538,5 +538,14 @@ do
   check("doctor names the tree-sitter CLI package for Homebrew", P["tree-sitter"].brew == "tree-sitter-cli" and P["tree-sitter"].dnf == "tree-sitter-cli")
 end
 
+-- The ide launcher: version and update usage
+do
+  local launcher = vim.fn.stdpath("config") .. "/extras/ide"
+  local v = vim.fn.system({ "bash", launcher, "version" })
+  check("ide version prints the version and nvim", v:find("vim%-ide") ~= nil and v:find("NVIM") ~= nil, v)
+  vim.fn.system({ "bash", launcher, "update", "bogus" })
+  check("ide update rejects an unknown mode", vim.v.shell_error == 2)
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")
