@@ -19,6 +19,8 @@ local features = {
     "<Space>rt pick a task · <Space>rr run the last one again · :IDETasks" },
   { "Sessions and projects", "Quitting remembers the open files and cursor lines per folder; `ide` in that folder reopens them. Recent projects switches folders.",
     "palette: Recent projects · dashboard o · :IDESessionSave · Settings > Features > Restore last session" },
+  { "Guided tour", "Five short callouts: activity bar, tabs, editor, command palette, statusline and panels.",
+    ":IDETour · palette: Take the tour · welcome page key t" },
   { "Doctor and welcome", "A first-run welcome checks that icons render, runs the doctor and lists the first keys. The doctor shows missing tools with the exact install command.",
     ":IDEWelcome · :IDEDoctor · palette: Doctor" },
   { "Explorer extras", "Beyond add / delete / rename: terminal in the folder, copy path, open in the system file manager, search inside a folder.",

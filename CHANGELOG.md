@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.0 - Guided tour
+
+`:IDETour` (palette, or key t on the welcome page) walks through the activity bar, tabs, editor, command palette and statusline with five short callouts.
+
 ## 0.15.0 - Right-click menus
 
 Right-click in the editor or on an Explorer entry opens a context menu (definition, references, rename, format, clipboard, Claude, split; open, new, rename, delete, copy path, terminal here). One shared menu widget now also powers the tab menu. Also fixes a late Source Control refresh overwriting a newer one.

@@ -52,6 +52,7 @@ local page = ui.page({
       { "Alt-t", "Terminal panel" }, { "Alt-c", "Claude Code panel" }, { "<Space>", "Pause after it: a menu lists every shortcut" },
     }) do b:add(b.margin .. string.format("%-9s %s", k[1], k[2]), nil, { keycol = true }) end
     b:blank()
+    b:add(b.margin .. "t   Take a one-minute tour", "IDEKey", { act = "t" })
     b:add(b.margin .. "h   Full Help       s   Settings       q   Close", "IDEKey")
   end,
   sections = { "Icons", "Tools", "First keys" },
@@ -59,6 +60,7 @@ local page = ui.page({
     y = function(p) set_icons(true); p:close() end,
     n = function(p) set_icons(false); p:close() end,
     d = function(p) p:close(); require("config.doctor").open() end,
+    t = function(p) p:close(); vim.schedule(function() require("config.tour").start() end) end,
     h = function(p) p:close(); require("config.help").open() end,
     s = function(p) p:close(); require("config.settings_ui").open() end,
   },

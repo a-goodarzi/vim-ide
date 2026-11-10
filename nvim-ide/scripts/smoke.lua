@@ -467,5 +467,17 @@ do
   check("right-click is mapped", vim.fn.maparg("<RightMouse>", "n", false, true).desc == "Context menu")
 end
 
+-- Guided tour
+do
+  local tour = require("config.tour")
+  vim.cmd("enew"); tour.start(); vim.wait(100)
+  check("tour opens at step 1 as a float", tour.is_open() and tour.step() == 1 and vim.api.nvim_win_get_config(0).relative == "editor")
+  vim.api.nvim_feedkeys(vim.keycode("<CR><CR><CR><CR>"), "x", false); vim.wait(100)
+  check("tour reaches step 5", tour.step() == 5)
+  vim.api.nvim_feedkeys(vim.keycode("<CR>"), "x", false); vim.wait(100)
+  check("tour closes after the last step", not tour.is_open())
+  check("command :IDETour exists", vim.fn.exists(":IDETour") == 2)
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

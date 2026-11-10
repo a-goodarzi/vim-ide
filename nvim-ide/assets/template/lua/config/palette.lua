@@ -58,6 +58,7 @@ M.items = {
   { "Tools", "Claude Code panel", "Alt-c", cmd("ClaudeCode") },
   { "Tools", "Settings", "<Space>us", cmd("IDESettings") },
   { "Tools", "Doctor (check required tools)", "", cmd("IDEDoctor") },
+  { "Tools", "Take the tour", "", cmd("IDETour") },
   { "Tools", "Welcome / first-run check", "", cmd("IDEWelcome") },
   { "Tools", "Help and shortcuts", "<Space>?", cmd("IDEHelp") },
   { "Tools", "Mason (language servers)", "", cmd("Mason") },
