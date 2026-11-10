@@ -4,7 +4,7 @@
   "ayu": { "branch": "master", "commit": "e5a9f0fa2918d6b5f57c21b3ac014314ee5e41c8" },
   "blink.cmp": { "branch": "main", "commit": "78336bc89ee5365633bcf754d93df01678b5c08f" },
   "catppuccin": { "branch": "main", "commit": "edefef779ab08ce1a4a404713e3012b0d202bd35" },
-  "claudecode.nvim": { "branch": "main", "commit": "8affa12a7b232a516ef372534fde0ab18f5deb6c" },
+  "claudecode.nvim": { "branch": "main", "commit": "825881b37f83d7d5be1aa981bb4ec23e97cc69db" },
   "conform.nvim": { "branch": "master", "commit": "016802de402556da54c36bd7359b441266b01cdd" },
   "diffview.nvim": { "branch": "main", "commit": "4516612fe98ff56ae0415a259ff6361a89419b0a" },
   "dracula.nvim": { "branch": "main", "commit": "ae752c13e95fb7c5f58da4b5123cb804ea7568ee" },

@@ -1,8 +1,12 @@
 # Changelog
 
+## 0.30.4 - Claude panel opens in insert mode
+
+The panel was opening in normal mode (you had to press i); it now enters insert mode when created and when you move into it. The minimap no longer stays drawn on top of the panel (it is hidden once the panel is recognised).
+
 ## 0.30.3 - Typing in the Claude panel
 
-Entering the Claude panel (click, Alt-hjkl, :wincmd) now switches the terminal to insert mode, so typing goes to Claude and is not read as Vim normal-mode keys.
+Entering or opening the Claude panel (click, Alt-hjkl, :wincmd, first open) now switches the terminal to insert mode, so typing goes to Claude and is not read as Vim normal-mode keys.
 
 ## 0.30.2 - Smoke test fix
 

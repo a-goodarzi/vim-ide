@@ -65,18 +65,21 @@ return {
       -- The minimap is a float pinned to the screen's right edge; it would cover the Claude panel and full-screen pages
       -- (Settings, Help, Plugins...), so step aside while one is visible and come back when it closes (only if we hid it).
       local hidden = false
-      vim.api.nvim_create_autocmd({ "WinNew", "WinClosed", "TermOpen", "BufWinEnter" }, { group = vim.api.nvim_create_augroup("ide-minimap-claude", { clear = true }),
-        callback = function() vim.schedule(function()
-          local claude = false
-          for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-            if vim.api.nvim_win_get_config(w).relative == "" then
-              local ft = vim.bo[vim.api.nvim_win_get_buf(w)].filetype
-              if ft == "snacks_terminal" or (ft:find("^ide%-") and ft ~= "ide-activity") then claude = true end
-            end
+      local function sync()
+        local claude = false
+        for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+          if vim.api.nvim_win_get_config(w).relative == "" then
+            local b = vim.api.nvim_win_get_buf(w)
+            local ft = vim.bo[b].filetype
+            if ft == "snacks_terminal" or vim.bo[b].buftype == "terminal" or (ft:find("^ide%-") and ft ~= "ide-activity") then claude = true end
           end
-          local open = map.current.win_data[vim.api.nvim_get_current_tabpage()] ~= nil
-          if claude and open then hidden = true; pcall(map.close)
-          elseif not claude and hidden then hidden = false; pcall(map.open) end
-        end) end })
+        end
+        local open = map.current.win_data[vim.api.nvim_get_current_tabpage()] ~= nil
+        if claude and open then hidden = true; pcall(map.close)
+        elseif not claude and hidden then hidden = false; pcall(map.open) end
+      end
+      -- the panel's filetype is set after its window appears, so look again shortly afterwards
+      vim.api.nvim_create_autocmd({ "WinNew", "WinClosed", "TermOpen", "BufWinEnter", "FileType" }, { group = vim.api.nvim_create_augroup("ide-minimap-claude", { clear = true }),
+        callback = function() vim.schedule(sync); vim.defer_fn(sync, 200) end })
     end },
 }

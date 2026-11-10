@@ -45,13 +45,16 @@ end
 
 -- Entering the Claude panel (click, Alt-hjkl, :wincmd) puts the terminal in insert mode, so typing goes to Claude instead of
 -- being read as Vim normal-mode keys. Ctrl-\\ Ctrl-n still leaves it.
-au({ "WinEnter", "BufEnter" }, { callback = function(a)
-  if vim.bo[a.buf].buftype == "terminal" and vim.bo[a.buf].filetype == "snacks_terminal" then
-    vim.schedule(function()
-      if vim.api.nvim_get_current_buf() == a.buf and vim.fn.mode() == "n" then pcall(vim.cmd, "startinsert") end
-    end)
-  end
+local function enter_insert(buf)
+  vim.schedule(function()
+    if vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_get_current_buf() == buf and vim.bo[buf].buftype == "terminal"
+      and vim.fn.mode() == "n" then pcall(vim.cmd, "startinsert") end
+  end)
+end
+au({ "WinEnter", "BufEnter", "TermOpen", "BufWinEnter" }, { callback = function(a)
+  if vim.bo[a.buf].buftype == "terminal" and (vim.bo[a.buf].filetype == "snacks_terminal" or a.event == "TermOpen") then enter_insert(a.buf) end
 end })
+au("FileType", { pattern = "snacks_terminal", callback = function(a) enter_insert(a.buf); vim.defer_fn(function() enter_insert(a.buf) end, 150) end })
 
 -- Clickable settings (gear) button, top-right corner
 if not standalone then
