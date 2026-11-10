@@ -36,6 +36,8 @@ M.items = {
   { "Test", "Run all tests", "<Space>tA", function() require("neotest").run.run(vim.fn.getcwd()) end },
   { "Test", "Run last test again", "<Space>tl", function() require("neotest").run.run_last() end },
   { "Test", "Test summary", "<Space>ts", function() require("neotest").summary.toggle() end },
+  { "Code", "Snippets...", "<Space>cS", cmd("IDESnippets") },
+  { "Claude", "Ask Claude about selection / file", "<Space>aq", function() require("config.assist").ask_selection() end },
   { "Search", "Search text in files", "<Space>fg", tele("live_grep") },
   { "Search", "Search & Replace sidebar", "Alt-f", ab("search") },
   { "Search", "Go to symbol in file", "<Space>o", tele("lsp_document_symbols") },

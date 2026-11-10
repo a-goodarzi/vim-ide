@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.0 - Snippets and Claude on a selection
+
+Snippet browser for the current file type and an action that sends the selection or file to Claude.
+
 ## 0.11.0 - Problems panel
 
 The Problems panel groups diagnostics by file with counts and takes focus when opened.

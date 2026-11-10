@@ -76,6 +76,9 @@ lazycmd("IDELayoutSave", "config.layout", "?"); lazycmd("IDELayoutLoad", "config
 -- Task runner
 lazycmd("IDETasks", "config.tasks"); lazycmd("IDETaskLast", "config.tasks")
 
+-- Snippets browser
+lazycmd("IDESnippets", "config.assist")
+
 -- Statusline (config/statusline.lua)
 vim.api.nvim_create_autocmd("VimEnter", { group = group, once = true, callback = function()
   vim.schedule(function() require("config.statusline").setup() end)

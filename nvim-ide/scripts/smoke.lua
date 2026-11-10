@@ -418,6 +418,17 @@ do
   check("explorer copy path fills the register", vim.fn.getreg('"'):find("one.txt", 1, true) ~= nil)
 end
 
+-- Snippet browser lists the snippets of the file type
+do
+  vim.cmd("enew"); vim.bo.filetype = "lua"
+  local real_select, nsn = vim.ui.select, 0
+  vim.ui.select = function(items) nsn = #items end
+  pcall(require("config.assist").snippets)
+  vim.ui.select = real_select
+  check("snippet browser lists lua snippets", nsn > 0, nsn)
+  check("command :IDESnippets exists", vim.fn.exists(":IDESnippets") == 2)
+end
+
 -- Remote module and commands
 do
   check("remote module loads", type(require("config.remote").pick) == "function")

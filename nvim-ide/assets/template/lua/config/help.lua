@@ -21,6 +21,8 @@ local features = {
     ":IDEWelcome · :IDEDoctor · palette: Doctor" },
   { "Explorer extras", "Beyond add / delete / rename: terminal in the folder, copy path, open in the system file manager, search inside a folder.",
     "In the tree: T terminal here · gy copy path · gY relative path · gO system file manager · gs search in folder · x c p cut / copy / paste several files" },
+  { "Snippets and Claude on a selection", "Browse the snippets for the current file type and insert one; send the selection (or file) to Claude as context.",
+    "<Space>cS snippets · <Space>aq ask Claude about the selection / file" },
   { "Activity bar (VS Code layout)", "Icon column on the far left switches the sidebar: Explorer, Search & Replace, Source Control, Run & Debug, Outline, Plugins.",
     "Click an icon (click it again to hide the sidebar) · Alt-e explorer · Alt-f search · Alt-g git · Alt-d debug · Alt-o outline · Alt-x plugins · Alt-b toggle" },
   { "Search & Replace in files", "Find text across the project and replace it, with a live preview (the VS Code Search view).",

@@ -70,5 +70,8 @@ map("n", "<leader>sm", function() require("config.layout").maximize() end, "Maxi
 map("n", "<leader>se", function() require("config.layout").equalize() end, "Equalize splits")
 map("n", "<leader>rt", "<cmd>IDETasks<cr>", "Run task...")
 map("n", "<leader>rr", "<cmd>IDETaskLast<cr>", "Run last task again")
+map("n", "<leader>cS", "<cmd>IDESnippets<cr>", "Browse snippets")
+map({ "n", "v" }, "<leader>aq", function() require("config.assist").ask_selection() end, "Ask Claude about selection / file")
+
 -- VS Code-style shortcuts
 if require("config").feature("vscode_keys") then require("config.vscode_keys") end

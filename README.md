@@ -21,6 +21,7 @@ works inside tmux, and every screen shares one design system.
 - **Test runner:** Run all / last / stop keys and palette entries for neotest, with pass and fail marks in the gutter.
 - **Explorer actions:** Terminal in the folder, copy path, open in the system file manager and search inside a folder from the Explorer.
 - **Problems panel:** The Problems panel groups diagnostics by file with counts and takes focus when opened.
+- **Snippets and Claude on a selection:** Snippet browser for the current file type and an action that sends the selection or file to Claude.
 
 ## Screenshots
 
