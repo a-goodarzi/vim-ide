@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.23.0 - Safe updates
+
+`ide update` / :IDEUpdate saves the plugin lockfile first and lists what changed (updated, added, removed); `ide rollback` / :IDERollback puts the saved lockfile back and restores those plugin versions. Verified end to end in a clean container.
+
 ## 0.22.0 - Demo GIF
 
 docs/demo.gif shows the palette, search, source control, terminal, tour and settings; `nvim-ide/scripts/make_demo.py` re-records it from a throw-away project and refuses to publish a screen that shows your user or machine name.

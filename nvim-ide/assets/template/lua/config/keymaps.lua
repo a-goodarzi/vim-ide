@@ -55,10 +55,7 @@ map("n", "<leader>uR", function()
 end, "Restart nvim (reload config)")
 
 -- Update everything: plugins (lazy.nvim) + Mason tools. Also `:IDEUpdate`, or `ide update` from the shell.
-local function update_all()
-  vim.cmd("Lazy update")
-  pcall(vim.cmd, "MasonToolsUpdate")
-end
+local function update_all() require("config.updater").update_all() end   -- saves the lockfile first, lists the changes after
 vim.api.nvim_create_user_command("IDEUpdate", update_all, { desc = "Update plugins and language tools" })
 map("n", "<leader>pU", update_all, "Update plugins + tools")
 

@@ -84,6 +84,9 @@ lazycmd("IDETasks", "config.tasks"); lazycmd("IDETaskLast", "config.tasks")
 -- Remote and containers
 lazycmd("IDERemote", "config.remote"); lazycmd("IDEContainers", "config.remote")
 
+-- Safe updates
+lazycmd("IDEUpdateReport", "config.updater"); lazycmd("IDERollback", "config.updater")
+
 -- Guided tour
 lazycmd("IDETour", "config.tour")
 

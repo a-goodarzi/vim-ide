@@ -519,5 +519,18 @@ do
   vim.cmd("only")
 end
 
+-- Safe updates: lockfile diff, formatting and snapshot
+do
+  local U = require("config.updater")
+  local d = U.diff({ a = { commit = "1111111aaa" }, b = { commit = "2222222bbb" }, gone = { commit = "3" } },
+                   { a = { commit = "9999999zzz" }, b = { commit = "2222222bbb" }, new = { commit = "4" } })
+  check("updater lists updated, added and removed plugins", #d.changed == 1 and d.changed[1][2] == "1111111" and d.changed[1][3] == "9999999" and d.added[1] == "new" and d.removed[1] == "gone")
+  check("updater formats a readable summary", U.format(d):find("1 updated, 1 added, 1 removed", 1, true) ~= nil and U.format({ added = {}, removed = {}, changed = {} }) == "No plugin changes.")
+  local snap = U.snapshot()
+  check("updater saves a copy of the lockfile", snap == nil or vim.uv.fs_stat(snap) ~= nil)
+  if snap then os.remove(snap) end
+  check("commands :IDERollback and :IDEUpdateReport exist", vim.fn.exists(":IDERollback") == 2 and vim.fn.exists(":IDEUpdateReport") == 2)
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

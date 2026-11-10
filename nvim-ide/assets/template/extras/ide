@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ide — launcher for the nvim IDE.   ide [files…] | ide claude | ide settings | ide help | ide sync | ide update
+# ide — launcher for the nvim IDE.   ide [files…] | ide claude | ide settings | ide help | ide sync | ide update | ide rollback
 # Works from any directory; finds its own config via the symlink target (extras/ide inside the config dir).
 set -euo pipefail
 SELF="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -9,13 +9,14 @@ APP="${NVIM_APPNAME:-${IDE_APPNAME:-$(basename "$CFG")}}"
 [[ "$APP" == "template" ]] && APP="nvim-ide"
 export NVIM_APPNAME="$APP"
 # Headless sync/update clone public plugin repos only: never pop up a credential dialog.
-if [[ "${1:-}" == "sync" || "${1:-}" == "update" ]]; then export GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=true SSH_ASKPASS_REQUIRE=never; fi
+if [[ "${1:-}" == "sync" || "${1:-}" == "update" || "${1:-}" == "rollback" ]]; then export GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=true SSH_ASKPASS_REQUIRE=never; fi
 case "${1:-}" in
   claude)   shift; exec nvim -c "lua vim.schedule(function() vim.cmd('ClaudeCode') end)" "$@" ;;
   settings) export IDE_SETTINGS_ONLY=1; exec nvim -c "IDESettings" ;;   # full-screen settings TUI, q quits
   help)     export IDE_SETTINGS_ONLY=1; exec nvim -c "IDEHelp" ;;
   sync)     exec nvim --headless "+Lazy! sync" +qa ;;
-  update)   exec nvim --headless "+Lazy! update" "+lua pcall(vim.cmd, 'MasonToolsUpdate'); vim.wait(60000)" +qa ;;  # latest plugins + tools
+  update)   exec nvim --headless "+lua require('config.updater').update_all()" +qa ;;  # saves the lockfile, updates plugins + tools, lists the changes
+  rollback) exec nvim --headless "+lua require('config.updater').rollback()" +qa ;;     # undo the last update
   -h|--help) sed -n '2,3p' "$SELF"; exit 0 ;;
   *)        exec nvim "$@" ;;
 esac
