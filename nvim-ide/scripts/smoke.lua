@@ -492,5 +492,19 @@ do
   cfg.settings.transparent = was_t; th.apply(cfg.settings.colorscheme)
 end
 
+-- Tab style option: each style renders and the flat style has no powerline glyphs
+do
+  local T = require("config.tabs")
+  local was = cfg.settings.tabs_style
+  for _, st in ipairs({ "slanted", "rounded", "flat" }) do
+    cfg.settings.tabs_style = st
+    local out = T.render()
+    check("tab bar renders in the " .. st .. " style", type(out) == "string" and out:find("IdeTabClick", 1, true) ~= nil)
+    if st == "flat" then check("flat tabs use no powerline glyphs", not out:find("\xee\x82", 1, true)) end
+    if st == "rounded" then check("rounded tabs use the pill glyphs", out:find("\xee\x82\xb6", 1, true) ~= nil) end
+  end
+  cfg.settings.tabs_style = was
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

@@ -12,7 +12,7 @@ local features = {
   { "Right-click menus", "Right-click in the editor (definition, references, rename, format, cut / copy / paste, Claude) or on an Explorer entry (open, new, rename, delete, copy path, terminal here...).",
     "Esc or a click elsewhere closes the menu · Settings > Features > Right-click menus" },
   { "Tabs", "Slanted tabs with file icon, modified dot and diagnostics. Right-click a tab for pin, move, close others, copy path, reveal in Explorer.",
-    "Middle-click or x closes · <Space>bp pin · Alt-< / Alt-> move · Shift-h / Shift-l switch" },
+    "Settings > Appearance > Tab style: slanted, rounded or flat. Middle-click or x closes · <Space>bp pin · Alt-< / Alt-> move · Shift-h / Shift-l switch" },
   { "Splits and layouts", "Split, close and maximize editor windows; save a named layout (which files sit in which splits) and load it later.",
     "<Space>sv split right · sh below · sx close · sm maximize / restore · se equalize · palette: Layout" },
   { "Tasks", "Finds what the project can run (Makefile, npm scripts, go, pytest, cargo, terraform, justfile, .vscode/tasks.json) and runs it in the terminal panel.",

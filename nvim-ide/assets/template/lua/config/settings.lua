@@ -13,6 +13,9 @@ return {
   -- Statusline look: "rounded" (powerlevel10k-like pills), "powerline" (arrows), "plain"
   statusline_style = "rounded",
 
+  -- Tab shape: "slanted" (trapezoids), "rounded" (pills) or "flat" (plain blocks)
+  tabs_style = "slanted",
+
   -- Language presets, defined in lua/config/languages.lua.
   languages = { "lua", "python", "go", "html_css", "javascript", "terraform", "bash", "markdown", "json", "yaml" },
 

@@ -171,7 +171,12 @@ function M.render()
     local off, title, bar = left_offset()
     local avail = vim.o.columns - off - 14           -- 14 = the 4 top-right buttons
     local fancy = icons()
-    local capl, capr = fancy and "\xee\x82\xba" or " ", fancy and "\xee\x82\xb8" or " "   -- slanted trapezoid sides
+    local style = require("config").settings.tabs_style or "slanted"
+    local flat = style == "flat" or not fancy
+    local capl, capr = " ", " "
+    if not flat then
+      if style == "rounded" then capl, capr = "\xee\x82\xb6", "\xee\x82\xb4" else capl, capr = "\xee\x82\xba", "\xee\x82\xb8" end   -- slanted trapezoid sides
+    end
     local tabs = tab_list()
     local sel = vim.api.nvim_get_current_buf()
     if not is_editing_win(vim.api.nvim_get_current_win()) then
@@ -196,11 +201,12 @@ function M.render()
       local n = vim.fn.strchars(label)
       if n > 24 then label = vim.fn.strcharpart(label, 0, 14) .. "\xe2\x80\xa6" .. vim.fn.strcharpart(label, n - 9) end
       local icon = icon_for(t.name:match("[^/]+$"), active and "sel" or "idle")
+      if flat then edge = hl end        -- flat tabs: the padding belongs to the tab itself
       local s = "%#" .. edge .. "#" .. capl
         .. "%" .. t.buf .. "@v:lua.IdeTabClick@%#" .. hl .. "# " .. icon .. "%#" .. hl .. "#" .. esc(label) .. diag .. "%#" .. hl .. "# %X"
         .. "%" .. t.buf .. "@v:lua.IdeTabClose@%#" .. mark_hl .. "#" .. mark .. "%#" .. hl .. "# %X"
-        .. "%#" .. edge .. "#" .. capr
-      parts[#parts + 1] = { s = s, w = 1 + 1 + (icon ~= "" and 2 or 0) + width(label) + dw + 1 + 1 + 1 + 1 + 1, active = active }
+        .. "%#" .. edge .. "#" .. capr .. (flat and "%#IDETabFill# " or "")
+      parts[#parts + 1] = { s = s, w = 1 + 1 + (icon ~= "" and 2 or 0) + width(label) + dw + 1 + 1 + 1 + 1 + 1 + (flat and 1 or 0), active = active }
     end
     local first, total, act = 1, 0, 1
     for i, p in ipairs(parts) do total = total + p.w; if p.active then act = i end end
