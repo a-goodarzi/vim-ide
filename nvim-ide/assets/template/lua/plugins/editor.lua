@@ -47,8 +47,11 @@ return {
   { "nvim-neo-tree/neo-tree.nvim", branch = "v3.x", cmd = "Neotree",
     dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim", icons and "nvim-tree/nvim-web-devicons" or nil },
     keys = { { "<leader>e", "<cmd>Neotree toggle reveal<cr>", desc = "Explorer" } },
-    opts = { popup_border_style = "rounded", window = { width = 34 },
-      filesystem = { follow_current_file = { enabled = true }, filtered_items = { visible = true } } } },
+    opts = function()
+      local ea = require("config.explorer_actions")
+      return { popup_border_style = "rounded", window = { width = 34, mappings = ea.mappings },
+        filesystem = { follow_current_file = { enabled = true }, filtered_items = { visible = true }, commands = ea.commands } }
+    end },
 
   -- Editing helpers -------------------------------------------------------
   { "echasnovski/mini.pairs", event = "InsertEnter", opts = {} },

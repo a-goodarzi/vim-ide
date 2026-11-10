@@ -19,6 +19,8 @@ local features = {
     "palette: Recent projects · dashboard o · :IDESessionSave · Settings > Features > Restore last session" },
   { "Doctor and welcome", "A first-run welcome checks that icons render, runs the doctor and lists the first keys. The doctor shows missing tools with the exact install command.",
     ":IDEWelcome · :IDEDoctor · palette: Doctor" },
+  { "Explorer extras", "Beyond add / delete / rename: terminal in the folder, copy path, open in the system file manager, search inside a folder.",
+    "In the tree: T terminal here · gy copy path · gY relative path · gO system file manager · gs search in folder · x c p cut / copy / paste several files" },
   { "Activity bar (VS Code layout)", "Icon column on the far left switches the sidebar: Explorer, Search & Replace, Source Control, Run & Debug, Outline, Plugins.",
     "Click an icon (click it again to hide the sidebar) · Alt-e explorer · Alt-f search · Alt-g git · Alt-d debug · Alt-o outline · Alt-x plugins · Alt-b toggle" },
   { "Search & Replace in files", "Find text across the project and replace it, with a live preview (the VS Code Search view).",

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.0 - Explorer actions
+
+Terminal in the folder, copy path, open in the system file manager and search inside a folder from the Explorer.
+
 ## 0.9.0 - Test runner
 
 Run all / last / stop keys and palette entries for neotest, with pass and fail marks in the gutter.

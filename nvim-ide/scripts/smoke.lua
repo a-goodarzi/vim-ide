@@ -410,6 +410,14 @@ do
   check("command :IDETasks exists", vim.fn.exists(":IDETasks") == 2)
 end
 
+-- Explorer actions are wired into neo-tree
+do
+  local ea = require("config.explorer_actions")
+  check("explorer actions are wired into neo-tree", ea.mappings.T == "terminal_here" and type(ea.commands.copy_path) == "function")
+  ea.copy_path("/tmp/one.txt", false)
+  check("explorer copy path fills the register", vim.fn.getreg('"'):find("one.txt", 1, true) ~= nil)
+end
+
 -- Remote module and commands
 do
   check("remote module loads", type(require("config.remote").pick) == "function")

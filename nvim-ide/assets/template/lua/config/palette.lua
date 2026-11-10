@@ -48,6 +48,7 @@ M.items = {
   { "View", "Plugins", "Alt-x", ab("plugins") },
   { "View", "Toggle sidebar", "Alt-b", function() require("config.activitybar").toggle() end },
   { "View", "Problems panel", "Alt-p", cmd("Trouble diagnostics toggle") },
+  { "View", "Explorer: open terminal here", "T", function() require("config.explorer_actions").terminal_here() end },
   { "View", "Zen mode", "", cmd("ZenMode") },
   { "View", "Change colour theme", "<Space>uC", tele("colorscheme", { enable_preview = true }) },
   { "Tools", "Open terminal panel", "Alt-t", cmd("ToggleTerm direction=horizontal") },
