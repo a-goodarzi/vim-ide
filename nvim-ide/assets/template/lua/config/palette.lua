@@ -29,6 +29,8 @@ M.items = {
   { "Layout", "Equalize splits", "<Space>se", function() require("config.layout").equalize() end },
   { "Layout", "Save current layout...", "", function() require("config.layout").ask_save() end },
   { "Layout", "Load a saved layout...", "", function() require("config.layout").pick_load() end },
+  { "Run", "Run task...", "<Space>rt", cmd("IDETasks") },
+  { "Run", "Run the last task again", "<Space>rr", cmd("IDETaskLast") },
   { "Search", "Search text in files", "<Space>fg", tele("live_grep") },
   { "Search", "Search & Replace sidebar", "Alt-f", ab("search") },
   { "Search", "Go to symbol in file", "<Space>o", tele("lsp_document_symbols") },

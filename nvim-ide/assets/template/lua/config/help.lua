@@ -13,6 +13,8 @@ local features = {
     "Middle-click or x closes · <Space>bp pin · Alt-< / Alt-> move · Shift-h / Shift-l switch" },
   { "Splits and layouts", "Split, close and maximize editor windows; save a named layout (which files sit in which splits) and load it later.",
     "<Space>sv split right · sh below · sx close · sm maximize / restore · se equalize · palette: Layout" },
+  { "Tasks", "Finds what the project can run (Makefile, npm scripts, go, pytest, cargo, terraform, justfile, .vscode/tasks.json) and runs it in the terminal panel.",
+    "<Space>rt pick a task · <Space>rr run the last one again · :IDETasks" },
   { "Sessions and projects", "Quitting remembers the open files and cursor lines per folder; `ide` in that folder reopens them. Recent projects switches folders.",
     "palette: Recent projects · dashboard o · :IDESessionSave · Settings > Features > Restore last session" },
   { "Doctor and welcome", "A first-run welcome checks that icons render, runs the doctor and lists the first keys. The doctor shows missing tools with the exact install command.",

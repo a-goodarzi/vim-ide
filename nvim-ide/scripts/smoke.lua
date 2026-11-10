@@ -396,6 +396,20 @@ do
   vim.cmd("only")
 end
 
+-- Task runner: finds make targets, npm scripts and go commands
+do
+  local pd = vim.fn.tempname(); vim.fn.mkdir(pd, "p")
+  vim.fn.writefile({ "build:", "\techo hi", "test: build", "\techo t" }, pd .. "/Makefile")
+  vim.fn.writefile({ '{"scripts":{"dev":"vite","lint":"eslint ."}}' }, pd .. "/package.json")
+  vim.fn.writefile({ "module x" }, pd .. "/go.mod")
+  local labels = {}
+  for _, t in ipairs(require("config.tasks").collect(pd)) do labels[t.src .. ":" .. t.label] = t.cmd end
+  check("tasks finds make targets", labels["make:build"] == "make build" and labels["make:test"] == "make test", vim.inspect(labels))
+  check("tasks finds npm scripts", labels["npm:dev"] == "npm run dev" and labels["npm:lint"] == "npm run lint")
+  check("tasks finds go commands", labels["go:test ./..."] == "go test ./...")
+  check("command :IDETasks exists", vim.fn.exists(":IDETasks") == 2)
+end
+
 -- Remote module and commands
 do
   check("remote module loads", type(require("config.remote").pick) == "function")

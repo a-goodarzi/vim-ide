@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0 - Task runner
+
+Finds Makefile targets, npm scripts, go, pytest, cargo, terraform, justfile and .vscode tasks and runs them in the terminal panel (`<Space>rt`, `<Space>rr`).
+
 ## 0.7.0 - Splits and layouts
 
 Split right / below, close, maximize and equalize editor windows; save and load named layouts.

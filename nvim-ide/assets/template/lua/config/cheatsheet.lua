@@ -39,6 +39,7 @@ local sections = {
   { "Splits & layout", {
     { "<Space>sv / sh", "Split right / below" }, { "<Space>sx", "Close split" }, { "<Space>sm", "Maximize / restore split" },
     { "<Space>se", "Equalize splits" }, { "palette: Layout", "Save / load named layouts (:IDELayoutSave, :IDELayoutLoad)" } } },
+  { "Tasks", { { "<Space>rt / rr", "Run a project task / run the last one again" } } },
   { "Sessions & projects", { { "palette: Recent projects", "Switch project (files reopen on start)" }, { ":IDESessionSave", "Save the session now" } } },
   { "Terminal", { { "Ctrl-\\", "Floating terminal" }, { "Alt-t / <Space>tt", "Terminal panel (also the top-right button)" } } },
   { "Settings & plugins", {

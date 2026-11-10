@@ -73,6 +73,9 @@ end
 -- Split layouts
 lazycmd("IDELayoutSave", "config.layout", "?"); lazycmd("IDELayoutLoad", "config.layout", "?")
 
+-- Task runner
+lazycmd("IDETasks", "config.tasks"); lazycmd("IDETaskLast", "config.tasks")
+
 -- Statusline (config/statusline.lua)
 vim.api.nvim_create_autocmd("VimEnter", { group = group, once = true, callback = function()
   vim.schedule(function() require("config.statusline").setup() end)

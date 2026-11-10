@@ -17,6 +17,7 @@ works inside tmux, and every screen shares one design system.
 - **Session restore and recent projects:** Quitting saves the open files per folder and `ide` reopens them. Palette > Recent projects (and the dashboard `o` key) switches folders.
 - **Tab features:** Right-click a tab for pin, move, close others / to the right, copy path and reveal in Explorer. Alt-< / Alt-> move a tab; Shift-h / Shift-l follow the tab order.
 - **Splits and layouts:** Split right / below, close, maximize and equalize editor windows; save and load named layouts.
+- **Task runner:** Finds Makefile targets, npm scripts, go, pytest, cargo, terraform, justfile and .vscode tasks and runs them in the terminal panel (`<Space>rt`, `<Space>rr`).
 
 ## Screenshots
 

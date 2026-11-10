@@ -68,5 +68,7 @@ map("n", "<leader>sh", function() require("config.layout").split("below") end, "
 map("n", "<leader>sx", function() require("config.layout").close_split() end, "Close split")
 map("n", "<leader>sm", function() require("config.layout").maximize() end, "Maximize / restore split")
 map("n", "<leader>se", function() require("config.layout").equalize() end, "Equalize splits")
+map("n", "<leader>rt", "<cmd>IDETasks<cr>", "Run task...")
+map("n", "<leader>rr", "<cmd>IDETaskLast<cr>", "Run last task again")
 -- VS Code-style shortcuts
 if require("config").feature("vscode_keys") then require("config.vscode_keys") end
