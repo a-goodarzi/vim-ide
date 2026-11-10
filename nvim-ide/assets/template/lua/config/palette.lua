@@ -46,6 +46,11 @@ M.items = {
   { "Debug", "Toggle breakpoint", "F9", feed("<F9>") },
   { "", "All Vim commands...", "", tele("commands") },
 }
+if not require("config").feature("debug") then   -- Debugger switched off in Settings: no debug entries
+  local keep = {}
+  for _, it in ipairs(M.items) do if it[1] ~= "Debug" and it[2] ~= "Run & Debug" then keep[#keep + 1] = it end end
+  M.items = keep
+end
 
 function M.open()
   local ok, pickers = pcall(require, "telescope.pickers")

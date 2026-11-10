@@ -31,7 +31,7 @@ local features = {
     "<Space>cf format now · :FormatToggle turn format-on-save off/on · :ConformInfo shows the formatter in use" },
   { "Git", "Change marks in the gutter, hunk staging, blame, diff view, lazygit.",
     "]h / [h next/prev hunk · <Space>gs stage · gr reset · gp preview · gb blame · gv diff view · tg lazygit" },
-  { "Debugger", "Breakpoints, stepping and a variables panel (nvim-dap).",
+  { "Debugger", "Breakpoints, stepping and a variables panel (nvim-dap). Switch it off in Settings > Features > Debugger.",
     "<Space>db breakpoint · dc continue/start · di / do / dO step in/over/out · du toggle UI · dt stop" },
   { "Tests", "Run the nearest test or a whole file and see results inline (neotest).",
     "<Space>tn nearest · tf file · ts summary · to output · td debug nearest (when the debugger is on)" },

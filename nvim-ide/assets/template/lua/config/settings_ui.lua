@@ -48,7 +48,7 @@ local schema = {
 
   { section = "Features" },
   { key = "features.git", type = "bool", label = "Git integration", desc = "Hunks, blame, diff view", restart = true },
-  { key = "features.debug", type = "bool", label = "Debugger (DAP)", desc = "Breakpoints and stepping", restart = true },
+  { key = "features.debug", type = "bool", label = "Debugger (Run & Debug)", desc = "The Run & Debug sidebar icon, F5/F9/F10/F11, breakpoints and stepping. Off = lighter, no debug plugins load", restart = true },
   { key = "features.test", type = "bool", label = "Test runner", desc = "neotest: run tests from the editor", restart = true },
   { key = "features.terminal", type = "bool", label = "Terminal toggle", desc = "Floating terminal and lazygit", restart = true },
   { key = "features.format_on_save", type = "bool", label = "Format on save", desc = "Run the formatter when saving (instant)", live = function() end },

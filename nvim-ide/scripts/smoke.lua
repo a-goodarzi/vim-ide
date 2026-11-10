@@ -298,5 +298,44 @@ end
 check("palette entries are well-formed", #pbad == 0, table.concat(pbad, ","))
 check("F1 opens the curated palette", (vim.fn.maparg("<F1>", "n", false, true).desc or "") == "Command palette")
 
+-- Debugger option: the Run & Debug icon and palette group follow features.debug
+do
+  local has_debug = false
+  for _, v in ipairs(require("config.activitybar").views) do if v.id == "debug" then has_debug = true end end
+  check("Run & Debug icon follows features.debug", has_debug == cfg.feature("debug"))
+  local pal_debug = false
+  for _, it in ipairs(require("config.palette").items) do if it[1] == "Debug" then pal_debug = true end end
+  check("palette Debug group follows features.debug", pal_debug == cfg.feature("debug"))
+end
+
+-- Source Control panel (scm) on a scratch repo
+do
+  local ABv = require("config.activitybar")
+  local dir = vim.fn.tempname(); vim.fn.mkdir(dir, "p")
+  local oldcwd = vim.fn.getcwd()
+  vim.env.GIT_AUTHOR_NAME, vim.env.GIT_AUTHOR_EMAIL, vim.env.GIT_COMMITTER_NAME, vim.env.GIT_COMMITTER_EMAIL = "t", "t@example.com", "t", "t@example.com"
+  vim.fn.system({ "git", "-C", dir, "init", "-q", "-b", "main" })
+  vim.fn.writefile({ "hello" }, dir .. "/a.txt")
+  vim.cmd("cd " .. vim.fn.fnameescape(dir))
+  local scm = require("config.scm")
+  ABv.setup(); vim.wait(300)
+  ABv.show("git"); vim.wait(1500, function() return #scm.state.untracked == 1 end)
+  check("scm lists an untracked file", #scm.state.untracked == 1, vim.inspect(scm.state))
+  scm.stage({ file = { path = "a.txt", code = "?" } })
+  vim.wait(1500, function() return #scm.state.staged == 1 end)
+  check("scm stage moves the file to Staged", #scm.state.staged == 1)
+  scm.msg = "first"; scm.commit()
+  vim.wait(2500, function() return #scm.state.staged == 0 and scm.msg == "" end)
+  check("scm commit empties the staged list", #scm.state.staged == 0 and #scm.state.untracked == 0)
+  check("scm commit exists in git log", vim.fn.system({ "git", "-C", dir, "log", "--oneline" }):find("first") ~= nil)
+  vim.fn.writefile({ "hello", "again" }, dir .. "/a.txt")
+  scm.refresh(); vim.wait(1500, function() return #scm.state.changed == 1 end)
+  check("scm lists a modified file", #scm.state.changed == 1)
+  check("scm sidebar counts as a sidebar for the tab bar", vim.bo[scm.buf].filetype == "idescm" and scm.is_open())
+  ABv.show("git"); vim.wait(300)
+  check("activity bar closes the scm panel", not scm.is_open())
+  vim.cmd("cd " .. vim.fn.fnameescape(oldcwd))
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

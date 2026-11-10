@@ -11,6 +11,7 @@ works inside tmux, and every screen shares one design system.
 - **In-editor Settings and Help pages:** 29 colour themes, transparent mode, statusline style and feature toggles. They are saved outside the config, so updates don't overwrite them.
 - **Command palette:** F1 or `<Space>P`.
 - **Launcher:** `ide`, `ide claude`, `ide settings`, `ide help`.
+- **Debugger option:** Settings > Features > Debugger switches Run & Debug on or off: the activity-bar icon, F5/F9/F10/F11, the palette entries and the debug plugins all follow it.
 
 ## Screenshots
 

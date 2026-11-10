@@ -28,6 +28,10 @@ local views = {
     open = function() require("config.plugins_ui").open() end,
     close = function() end },
 }
+-- Features switched off in Settings leave no icon behind.
+if not require("config").feature("debug") then
+  for i = #views, 1, -1 do if views[i].id == "debug" then table.remove(views, i) end end
+end
 local by_id = {}
 for _, v in ipairs(views) do by_id[v.id] = v end
 
@@ -54,7 +58,11 @@ end
 
 --- Show a view (hides the current one). Clicking the active view hides the sidebar.
 function M.show(id)
-  local v = by_id[id]; if not v then return end
+  local v = by_id[id]
+  if not v then
+    if id == "debug" then vim.notify("The debugger is switched off: Settings > Features > Debugger", vim.log.levels.INFO) end
+    return
+  end
   local keep = vim.api.nvim_get_current_win()
   if M.active and by_id[M.active] then pcall(by_id[M.active].close) end
   if M.active == id then M.active = nil; highlight(); return end
