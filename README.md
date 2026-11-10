@@ -10,7 +10,7 @@ works inside tmux, and every screen shares one design system.
 - **Languages:** Python, Go, HTML/CSS, JavaScript, Terraform, Bash, Markdown, JSON, YAML, Lua. Each has an LSP, tree-sitter, a formatter and a linter (installed through Mason).
 - **In-editor Settings and Help pages:** 29 colour themes, transparent mode, statusline style and feature toggles. They are saved outside the config, so updates don't overwrite them.
 - **Command palette:** F1 or `<Space>P`.
-- **Launcher:** `ide`, `ide claude`, `ide settings`, `ide help`.
+- **Launcher:** `ide`, `ide claude`, `ide settings`, `ide help`, `ide update`, `ide rollback`.
 - **Debugger option:** Settings > Features > Debugger switches Run & Debug on or off: the activity-bar icon, F5/F9/F10/F11, the palette entries and the debug plugins all follow it.
 - **Source Control sidebar:** A real Git panel: branch, commit box, staged / changed / untracked files, click for the diff, + - x to stage, unstage or discard, buttons for commit, pull and push, branch switching.
 - **First-run welcome and doctor:** A welcome page on the first start (icon check, tool check, first keys) and `:IDEDoctor`, which lists missing tools with the exact install command for your system.
@@ -134,7 +134,10 @@ For tmux, add `nvim-ide/assets/template/extras/tmux.conf` to your tmux config (t
 | Path | Contents |
 |---|---|
 | `nvim-ide/assets/template/` | The Neovim config (`init.lua`, `lua/config`, `lua/plugins`, `extras/`) |
-| `nvim-ide/scripts/` | `dev.sh`, `install.sh`, `doctor.sh`, `smoke.lua` (regression tests) |
+| `nvim-ide/scripts/` | `dev.sh`, `install.sh`, `doctor.sh`, `smoke.lua` (regression tests), `theme_check.lua` (contrast of all themes), `make_demo.py` (records the demo GIF) |
+| `install.sh`, `Dockerfile`, `packaging/homebrew/` | One-line installer with checksum, Docker image, Homebrew formula template |
+| `docs/` | Screenshots, the demo GIF and the guide to adding a language, theme or feature |
+| `CHANGELOG.md`, `ROADMAP.md`, `CONTRIBUTING.md`, `VERSION` | Release notes, ideas queue, contribution rules, current version |
 | `nvim-ide/SKILL.md`, `references/` | A Claude skill for building and maintaining this IDE |
 | `nvim-tui-ux/` | A Claude skill with the UI/UX rules and lessons learned, a UI lint (`scripts/ui_lint.py`) and the shared UI kit |
 
@@ -147,7 +150,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/ADDING.md](docs/ADDING.md) (how
 ## Development
 
 ```sh
-bash nvim-ide/scripts/dev.sh --skip-mason --no-run                # install, 98 smoke tests, tmux render check
+bash nvim-ide/scripts/dev.sh --skip-mason --no-run                # install, 155 smoke tests, tmux render check
 python3 nvim-tui-ux/scripts/ui_lint.py --strict nvim-ide/assets/template/lua
 ```
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.23.1 - Documentation update
+
+README, repository layout, the nvim-ide skill and three new lessons (async sequence checks, theme background, clean-container installs) are brought up to date with 0.14 to 0.23.
+
 ## 0.23.0 - Safe updates
 
 `ide update` / :IDEUpdate saves the plugin lockfile first and lists what changed (updated, added, removed); `ide rollback` / :IDERollback puts the saved lockfile back and restores those plugin versions. Verified end to end in a clean container.

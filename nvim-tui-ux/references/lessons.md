@@ -171,3 +171,18 @@ building. When you hit a new one, add it with `scripts/add_lesson.py` (and a lin
 **Seen:** mini.map covered the Claude panel; nvim_set_hl in the transparent helper dropped every foreground colour; dapui panels had no titles and F5 failed silently with a broken adapter; snacks notifications cut long text.
 **Rule:** Hide right-edge floats while a right panel is open, preserve fg when clearing backgrounds, title dap panels, notify when an adapter command is empty, wrap notifications.
 *(added 2026-11-10)*
+
+## 37. Async results need a sequence check, and tests need a precise wait
+**Seen:** Two git refreshes raced and the older one overwrote the newer state; a smoke test then passed or failed by luck because it waited for 'one untracked file', which the surrounding repo also had.
+**Rule:** Number every async refresh and drop results of older ones. In tests wait for a predicate that identifies the state you created (the right root, the right file), never just a count.
+*(added 2026-11-10)*
+
+## 38. Set 'background' explicitly when applying a theme
+**Seen:** Switching from a light theme to gruvbox, kanagawa or catppuccin kept the light variant because those plugins read vim.o.background; one plugin (solarized-osaka) was transparent by default; the Explorer kept the old theme's background.
+**Rule:** Set background from a light-theme list before :colorscheme, pass the transparent setting to plugins that own it, relink sidebar groups after every theme change, and run a script that measures contrast for every theme.
+*(added 2026-11-10)*
+
+## 39. Test installs in a clean container
+**Seen:** dev.sh failed on an account without ~/.config; nothing on the developer machine could show it.
+**Rule:** Build the Dockerfile (a clean distro) when install or update steps change, and run update and rollback there against real plugin repositories.
+*(added 2026-11-10)*
