@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.27.0 - Bigger icons
+
+Settings > Appearance > Icon size (default large): the activity bar uses 4-row tiles with a filled active tile and a colour per view, and icons get room after them in the tab bar so a wide glyph can grow. For the largest icons use a Nerd Font variant without "Mono" in its name (a terminal draws text on a grid, so the font decides the glyph size).
+
 ## 0.26.0 - Card-style Settings, Help and Plugins
 
 Every setting is its own rounded card: a coloured title and status tag (changed / needs restart), a switch for on/off, filled option chips for choices (click one to pick it) and an input box for values. Sections get an icon and their own accent colour. Help topics, Plugins actions and the Doctor use the same cards and status chips (new builder helpers: card, span, chips).

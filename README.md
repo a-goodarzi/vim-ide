@@ -32,6 +32,7 @@ works inside tmux, and every screen shares one design system.
 - **ide update updates the IDE:** `ide update` now updates the IDE itself (latest release from GitHub, with the changelog of what is new), then plugins and tools; `ide update check` only looks, `ide update ide|plugins` does one half, `ide version` shows the version. Local edits block the IDE update. Also: nvim and the launcher append Homebrew, cargo and npm bin folders to PATH, so tools like tree-sitter are found even from a minimal shell, and the doctor shows the tree-sitter version.
 - **Mac shortcut notation:** On macOS (or with Settings > Appearance > Shortcut notation = mac) Help, the command palette, the tour and the welcome page show shortcuts as ⌃ ⌥ ⇧ instead of Ctrl / Alt / Shift, with a note about sending Option as Meta. The tree-sitter hints now also list npm, cargo and release-binary installs in case the Homebrew formula is unavailable.
 - **Card-style Settings, Help and Plugins:** Every setting is its own rounded card: a coloured title and status tag (changed / needs restart), a switch for on/off, filled option chips for choices (click one to pick it) and an input box for values. Sections get an icon and their own accent colour. Help topics, Plugins actions and the Doctor use the same cards and status chips (new builder helpers: card, span, chips).
+- **Bigger icons:** Settings > Appearance > Icon size (default large): the activity bar uses 4-row tiles with a filled active tile and a colour per view, and icons get room after them in the tab bar so a wide glyph can grow. For the largest icons use a Nerd Font variant without "Mono" in its name (a terminal draws text on a grid, so the font decides the glyph size).
 
 ## Screenshots
 
@@ -162,6 +163,7 @@ python3 nvim-tui-ux/scripts/ui_lint.py --strict nvim-ide/assets/template/lua
 
 ## Troubleshooting
 
+- **Icons look small:** a terminal draws text on a grid, so the font decides the glyph size. Use the Nerd Font variant *without* "Mono" in its name (e.g. "JetBrainsMono Nerd Font", not "... Nerd Font Mono"): its icons are drawn larger and overflow into the free cell next to them. Settings > Appearance > Icon size (default `large`) adds 4-row activity-bar tiles and room after each icon.
 - **Icons show as boxes:** set a Nerd Font in your terminal, or turn Icons off in Settings.
 - **Colours look wrong in tmux:** use `extras/tmux.conf`.
 - **A language server is missing:** run `:Mason`.

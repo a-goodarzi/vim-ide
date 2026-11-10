@@ -103,7 +103,7 @@ local tips = {
   "Search a keymap by what it does: <Space>fk. Search any command: <Space>fc.",
   "gc comments a line or selection · gsa/gsd/gsr surround · s jumps anywhere on screen · . repeats the last change.",
   "Inside the Claude panel Esc goes to Claude; use Ctrl-\\ Ctrl-n to get back to Neovim keys, or Alt-h/j/k/l to change window.",
-  "Something looks off? Settings > Appearance > Icons (needs a Nerd Font); then :checkhealth.",
+  "Something looks off? Settings > Appearance > Icons (needs a Nerd Font); then :checkhealth. Icons too small? Settings > Appearance > Icon size, and pick the Nerd Font variant without \"Mono\" in its name.",
   "Changed your mind about a setting? r resets it in the Settings tab; the ● marker shows what you changed.",
 }
 

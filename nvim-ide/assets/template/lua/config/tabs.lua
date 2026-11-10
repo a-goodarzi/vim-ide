@@ -72,6 +72,7 @@ local function icon_for(name, state)
   if not ok then return "" end
   local ic, col = dev.get_icon_color(name, vim.fn.fnamemodify(name, ":e"), { default = true })
   if not ic then return "" end
+  local pad = (require("config").settings.icon_size or "large") == "large" and " " or ""   -- room for a wide glyph
   local bg = state == "sel" and get("IDETabSelPlain").bg or get("IDETabIdle").bg
   local key = tostring(col) .. state
   if not icon_hl[key] then
@@ -80,7 +81,7 @@ local function icon_for(name, state)
     icon_hl[key] = "IDETabIcon" .. n
     vim.api.nvim_set_hl(0, icon_hl[key], { fg = col, bg = bg })
   end
-  return "%#" .. icon_hl[key] .. "#" .. ic .. " "
+  return "%#" .. icon_hl[key] .. "#" .. ic .. " " .. pad
 end
 
 local function is_editing_win(w)
@@ -206,7 +207,7 @@ function M.render()
         .. "%" .. t.buf .. "@v:lua.IdeTabClick@%#" .. hl .. "# " .. icon .. "%#" .. hl .. "#" .. esc(label) .. diag .. "%#" .. hl .. "# %X"
         .. "%" .. t.buf .. "@v:lua.IdeTabClose@%#" .. mark_hl .. "#" .. mark .. "%#" .. hl .. "# %X"
         .. "%#" .. edge .. "#" .. capr .. (flat and "%#IDETabFill# " or "")
-      parts[#parts + 1] = { s = s, w = 1 + 1 + (icon ~= "" and 2 or 0) + width(label) + dw + 1 + 1 + 1 + 1 + 1 + (flat and 1 or 0), active = active }
+      parts[#parts + 1] = { s = s, w = 1 + 1 + (icon ~= "" and (((require("config").settings.icon_size or "large") == "large") and 3 or 2) or 0) + width(label) + dw + 1 + 1 + 1 + 1 + 1 + (flat and 1 or 0), active = active }
     end
     local first, total, act = 1, 0, 1
     for i, p in ipairs(parts) do total = total + p.w; if p.active then act = i end end

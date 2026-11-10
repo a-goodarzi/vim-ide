@@ -46,15 +46,24 @@ for _, v in ipairs(views) do by_id[v.id] = v end
 
 local function bar_valid() return M.win and vim.api.nvim_win_is_valid(M.win) end
 
+-- Icon size: "large" makes each icon a 4-row tile (the active one is filled) with room after the glyph, so a Nerd Font glyph can
+-- grow into the next cell. A terminal draws text on a fixed grid, so this is as big as the bar can make an icon; a font
+-- variant without "Mono" in its name (e.g. "JetBrainsMono Nerd Font") draws the glyphs larger still.
+local function rows_per() return (require("config").settings.icon_size or "large") == "large" and 4 or 3 end
+local accents = { explorer = "IDEAccent", search = "IDEInfo", git = "IDEWarn", debug = "IDEKey", outline = "IDEOn", plugins = "Special" }
+
 local function highlight()
   if not (M.buf and vim.api.nvim_buf_is_valid(M.buf)) then return end
   vim.api.nvim_buf_clear_namespace(M.buf, ns, 0, -1)
+  local rp, large = rows_per(), rows_per() == 4
   for i, v in ipairs(views) do
-    local line = (i - 1) * 3 + 1                      -- 0-based row of the icon line
+    local top = (i - 1) * rp                           -- 0-based first row of this icon's tile
+    local line = top + 1                               -- the icon row
     if M.active == v.id then
-      vim.api.nvim_buf_add_highlight(M.buf, ns, "IDEActivityActive", line, 0, -1)
+      if large then for r = top, top + rp - 2 do vim.api.nvim_buf_add_highlight(M.buf, ns, "IDEChipSel", r, 0, -1) end
+      else vim.api.nvim_buf_add_highlight(M.buf, ns, "IDEActivityActive", line, 0, -1) end
       vim.api.nvim_buf_set_extmark(M.buf, ns, line, 0, { virt_text = { { "\xe2\x96\x8e", "IDEActivityMark" } }, virt_text_pos = "overlay" })
-    else vim.api.nvim_buf_add_highlight(M.buf, ns, "IDEActivityIcon", line, 0, -1) end
+    else vim.api.nvim_buf_add_highlight(M.buf, ns, large and (accents[v.id] or "IDEActivityIcon") or "IDEActivityIcon", line, 0, -1) end
   end
 end
 
@@ -158,15 +167,23 @@ end
 
 local function build()
   local lines = {}
+  local large = rows_per() == 4
   for _, v in ipairs(views) do
-    lines[#lines + 1] = ""; lines[#lines + 1] = "  " .. (icons() and v.glyph or v.ascii); lines[#lines + 1] = ""
+    local g = icons() and v.glyph or v.ascii
+    lines[#lines + 1] = large and "    " or ""
+    lines[#lines + 1] = large and (" " .. g .. "  ") or ("  " .. g)      -- trailing cells stay free so a wide glyph can overflow into them
+    lines[#lines + 1] = large and "    " or ""
+    if large then lines[#lines + 1] = "" end
   end
   vim.bo[M.buf].modifiable = true
   vim.api.nvim_buf_set_lines(M.buf, 0, -1, false, lines)
   vim.bo[M.buf].modifiable = false
 end
 
-local function view_at(row) return views[math.floor((row - 1) / 3) + 1] end
+local function view_at(row) return views[math.floor((row - 1) / rows_per()) + 1] end
+
+--- Rebuild the bar after Settings changed the icon size.
+function M.rebuild() if bar_valid() then build(); highlight() end end
 
 function M.setup()
   if bar_valid() then return end

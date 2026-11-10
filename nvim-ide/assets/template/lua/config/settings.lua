@@ -16,6 +16,9 @@ return {
   -- Extra folders appended to PATH for nvim (tools nvim cannot find, e.g. installed by nvm or mise): { "~/my/bin" }
   extra_path = {},
 
+  -- Icon size: "large" (4-row tiles in the activity bar, spaced icons) or "normal"
+  icon_size = "large",
+
   -- Shortcut notation in Help, palette and tour: "auto" (⌃ ⌥ ⇧ on a Mac, Ctrl / Alt / Shift elsewhere), "mac" or "pc"
   key_style = "auto",
 
