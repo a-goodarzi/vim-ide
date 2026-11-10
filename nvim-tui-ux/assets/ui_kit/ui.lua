@@ -51,9 +51,29 @@ local widgets = {
   GrugFarResultsChangeIndicator = "DiagnosticWarn", GrugFarResultsRemoveIndicator = "DiagnosticError",
   GrugFarResultsAddIndicator = "DiagnosticOk", GrugFarResultsActionMessage = "IDEOn",
 }
+-- Chips (switches, selected options, status pills) are filled shapes: colours come from the theme's own groups.
+local function hlc(name, attr) return vim.api.nvim_get_hl(0, { name = name, link = false })[attr] end
+local function blend(a, b, t)
+  local function ch(n, s) return math.floor(n / s) % 256 end
+  local function m(s) return math.floor(ch(a, s) + (ch(b, s) - ch(a, s)) * t + .5) end
+  return m(65536) * 65536 + m(256) * 256 + m(1)
+end
+local function setup_chips()
+  local dark = vim.o.background == "dark"
+  local base = hlc("Normal", "bg") or (dark and 0x1e1e2e or 0xffffff)
+  local fg = hlc("Normal", "fg") or (dark and 0xcdd6f4 or 0x333333)
+  local chip = blend(base, fg, 0.16)
+  local function filled(src, fallback) return { fg = base, bg = hlc(src, "fg") or fallback or fg, bold = true } end
+  local set = function(n, v) vim.api.nvim_set_hl(0, n, v) end
+  set("IDEChip", { fg = fg, bg = chip })
+  set("IDEChipOff", { fg = hlc("Comment", "fg") or fg, bg = chip })
+  set("IDEChipSel", filled("Function")); set("IDEChipOn", filled("DiagnosticOk")); set("IDEChipWarn", filled("DiagnosticWarn"))
+  set("IDEChipErr", filled("DiagnosticError")); set("IDEChipInfo", filled("DiagnosticInfo"))
+end
 function M.setup_highlights()
   for name, link in pairs(roles) do vim.api.nvim_set_hl(0, name, { link = link, default = true }) end
   for name, link in pairs(widgets) do vim.api.nvim_set_hl(0, name, { link = link }) end
+  setup_chips()
 end
 vim.api.nvim_create_autocmd("ColorScheme", { group = vim.api.nvim_create_augroup("ide-ui-hl", { clear = true }), callback = M.setup_highlights })
 M.setup_highlights()
@@ -81,11 +101,58 @@ function M.install_click_handler()
   end, { expr = true, desc = "Click (IDE UI aware)" })
 end
 
+-- ── context menu ───────────────────────────────────────────────────────────────────────────────────
+--- Small floating menu at the mouse (or the cursor). items = { { "Label", fn }, ..., "-" = separator }.
+--- j/k and Enter or a click choose; Esc, q, a right-click or a click elsewhere closes it.
+function M.menu(items, opts)
+  opts = opts or {}
+  local rows, lines, w = {}, {}, 0
+  for _, it in ipairs(items) do
+    if it == "-" then rows[#rows + 1] = false else rows[#rows + 1] = it end
+  end
+  for _, r in ipairs(rows) do
+    lines[#lines + 1] = r and ("  " .. r[1] .. "  ") or ""
+    w = math.max(w, vim.fn.strdisplaywidth(lines[#lines]))
+  end
+  for i, r in ipairs(rows) do if not r then lines[i] = string.rep(M.RULE, w) end end
+  local m = vim.fn.getmousepos()
+  local b = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(b, 0, -1, false, lines)
+  vim.bo[b].bufhidden = "wipe"
+  local row = opts.row or math.max(0, math.min((m.screenrow or 2), vim.o.lines - #lines - 3))
+  local col = opts.col or math.max(0, math.min((m.screencol or 1) - 1, vim.o.columns - w - 2))
+  local win = vim.api.nvim_open_win(b, true, { relative = "editor", row = row, col = col, width = w, height = #lines,
+    style = "minimal", border = M.border, zindex = 80 })
+  M.setwo(win, { cursorline = true, winhighlight = "FloatBorder:IDERule,CursorLine:Visual" })
+  for i, r in ipairs(rows) do if not r then vim.api.nvim_buf_add_highlight(b, -1, "IDERule", i - 1, 0, -1) end end
+  local function first() for i, r in ipairs(rows) do if r then return i end end end
+  pcall(vim.api.nvim_win_set_cursor, win, { first() or 1, 0 })
+  local function close() if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end end
+  local function run(i) local it = rows[i]; close(); if it then vim.schedule(it[2]) end end
+  local function step(d)
+    local i = vim.api.nvim_win_get_cursor(win)[1]
+    repeat i = i + d until rows[i] or i < 1 or i > #rows
+    if rows[i] then vim.api.nvim_win_set_cursor(win, { i, 0 }) end
+  end
+  local k = function(lhs, fn) vim.keymap.set("n", lhs, fn, { buffer = b, nowait = true, silent = true }) end
+  k("<CR>", function() run(vim.api.nvim_win_get_cursor(win)[1]) end)
+  k("j", function() step(1) end); k("k", function() step(-1) end); k("<Down>", function() step(1) end); k("<Up>", function() step(-1) end)
+  k("<Esc>", close); k("q", close); k("<RightMouse>", close)
+  k("<LeftMouse>", function()
+    local p = vim.fn.getmousepos()
+    if p.winid == win then run(p.line) else close() end
+  end)
+  vim.api.nvim_create_autocmd("WinLeave", { buffer = b, once = true, callback = close })
+  return win
+end
+
 -- ── document builder ───────────────────────────────────────────────────────────────────────────────
 local Builder = {}; Builder.__index = Builder
 function M.builder(width)
-  return setmetatable({ lines = {}, hls = {}, meta = {}, width = width, margin = "   ", heads = {}, jumps = {} }, Builder)
+  return setmetatable({ lines = {}, hls = {}, spans = {}, meta = {}, width = width, margin = "   ", heads = {}, jumps = {} }, Builder)
 end
+--- Highlight a byte range of one line (chips, coloured words). Lines are 1-based, columns 0-based, `to` exclusive (-1 = end).
+function Builder:span(line, from, to, hl) self.spans[#self.spans + 1] = { line, from, to, hl } end
 function Builder:add(text, hl, meta)
   self.lines[#self.lines + 1] = text
   if hl then self.hls[#self.hls + 1] = { #self.lines, hl } end
@@ -93,18 +160,66 @@ function Builder:add(text, hl, meta)
   return #self.lines
 end
 function Builder:blank() return self:add("") end
-function Builder:rule(thick) return self:add(self.margin .. string.rep(thick and M.THICK or M.RULE, self.width), "IDERule") end
+function Builder:rule(thick, hl) return self:add(self.margin .. string.rep(thick and M.THICK or M.RULE, self.width), hl or "IDERule") end
 function Builder:title(text, sub)
   self:add(self.margin .. text, "IDEHeading")
   if sub then self:add(self.margin .. sub, "IDEMuted") end
   self:blank()
 end
 --- Section headline: blank, text, thick rule, blank. `id` lets number keys / jump bar find it.
-function Builder:head(text, id)
+--- `o` = { icon = "glyph", accent = "IDEAccent" }: a coloured icon and rule make each section recognisable at a glance.
+function Builder:head(text, id, o)
+  o = o or {}
   self:blank()
   self.heads[#self.heads + 1] = { line = #self.lines + 1, id = id }
-  self:add(self.margin .. text, "IDEHeading", { head = id })
-  self:rule(true); self:blank()
+  local l = self:add(self.margin .. (o.icon and (o.icon .. "  ") or "") .. text, "IDEHeading", { head = id })
+  if o.icon and o.accent then self:span(l, #self.margin, #self.margin + #o.icon, o.accent) end
+  self:rule(true, o.accent); self:blank()
+end
+
+local function dw(s) return vim.fn.strdisplaywidth(s) end
+--- Word-wrap `text` to `w` display columns.
+function M.wrap(text, w)
+  local out, cur = {}, ""
+  for word in tostring(text):gmatch("%S+") do
+    if cur == "" then cur = word
+    elseif dw(cur) + 1 + dw(word) <= w then cur = cur .. " " .. word
+    else out[#out + 1] = cur; cur = word end
+  end
+  if cur ~= "" or #out == 0 then out[#out + 1] = cur end
+  return out
+end
+
+--- A rounded card: a title in the top border, an optional status tag at the right, wrapped body lines.
+---   o = { title, accent = role, tag = { text, chip_hl }, meta = {...}, lines = { { text, hl, spans = { {from, to, hl} }, nowrap = true, meta = {} }, ... } }
+--- Returns the first and last line. Spans are byte offsets inside the line's text.
+function Builder:card(o)
+  local W = math.max(self.width, 30)
+  local accent = o.accent or "IDERule"
+  local first = #self.lines + 1
+  local title = " " .. o.title .. " "
+  local tag = o.tag and (" " .. o.tag[1] .. " ") or ""
+  local fill = math.max(W - 4 - dw(title) - dw(tag) - (o.tag and 1 or 0), 1)
+  local top = "\xe2\x95\xad\xe2\x94\x80" .. title .. string.rep(M.RULE, fill) .. tag .. (o.tag and M.RULE or "") .. M.RULE .. "\xe2\x95\xae"
+  -- (corner glyphs are 3 bytes each: ╭ ─ ╮)
+  local l = self:add(self.margin .. top, accent, o.meta)
+  self:span(l, #self.margin + 6, #self.margin + 6 + #title, "IDEHeading")
+  if o.tag then self:span(l, #self.margin + #top - 9 - #tag, #self.margin + #top - 9, o.tag[2] or "IDEChip") end   -- 9 = "─" "─" "╮" after the tag
+  local side = "\xe2\x94\x82"
+  for _, ln in ipairs(o.lines or {}) do
+    local okk, kmod = pcall(require, "config.keys")
+    local text0 = (okk and kmod.fmt(ln[1])) or ln[1]          -- Mac notation before padding, so the right border stays straight
+    local rows = ln.nowrap and { text0 } or M.wrap(text0, W - 4)
+    for _, r in ipairs(rows) do
+      local pad = string.rep(" ", math.max(W - 4 - dw(r), 0))
+      local lnum = self:add(self.margin .. side .. " " .. r .. pad .. " " .. side, accent, vim.tbl_extend("force", o.meta or {}, ln.meta or {}))
+      local start = #self.margin + #side + 1
+      self:span(lnum, start, start + #r, ln[2] or "Normal")
+      for _, sp in ipairs(ln.spans or {}) do self:span(lnum, start + sp[1], start + sp[2], sp[3]) end
+    end
+  end
+  self:add(self.margin .. "\xe2\x95\xb0" .. string.rep(M.RULE, W - 2) .. "\xe2\x95\xaf", accent, o.meta)
+  return first, #self.lines
 end
 --- Clickable jump bar of "1 Name   2 Name ..." entries.
 function Builder:jumpbar(names)
@@ -125,13 +240,21 @@ end
 ---          sections = {names} (number keys 1-9 + ]] [[ jump to headlines) }
 local Page = {}; Page.__index = Page
 
+--- Set window-LOCAL options. `vim.wo[win].x = v` on the current window also changes the global default (like :set), so
+--- the next file opened in any window would lose its line numbers / sign column. Always use this for chrome windows.
+function M.setwo(win, opts)
+  for k, v in pairs(opts) do pcall(vim.api.nvim_set_option_value, k, v, { scope = "local", win = win }) end
+end
+local PAGE_WINOPTS = { cursorline = true, wrap = false, number = false, relativenumber = false, signcolumn = "no", list = false,
+  spell = false, foldenable = false, scrolloff = 0 }
+
 local function editing_window()
   -- A window that holds a file or another page counts; sidebars (activity bar, explorer, search...) and terminals do not.
   local function ok(w)
     local b = vim.api.nvim_win_get_buf(w)
     local ft = vim.bo[b].filetype
     if vim.api.nvim_win_get_config(w).relative ~= "" then return false end
-    return vim.bo[b].buftype == "" or (ft:find("^ide%-") ~= nil and ft ~= "ide-activity")
+    return vim.bo[b].buftype == "" or ft == "snacks_dashboard" or (ft:find("^ide%-") ~= nil and ft ~= "ide-activity")
   end
   if ok(vim.api.nvim_get_current_win()) then return vim.api.nvim_get_current_win() end
   for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do if ok(w) then return w end end
@@ -146,7 +269,7 @@ function M.page(spec)
   return p
 end
 
-function Page:valid() return self.buf and vim.api.nvim_buf_is_valid(self.buf) end
+function Page:valid() return self.buf and vim.api.nvim_buf_is_valid(self.buf) and vim.api.nvim_buf_is_loaded(self.buf) end
 
 --- Move the cursor, clamped to the buffer (stale line numbers and clicks below the content must never raise).
 function Page:setcur(line)
@@ -177,6 +300,7 @@ function Page:render()
   vim.bo[self.buf].modifiable = false
   vim.api.nvim_buf_clear_namespace(self.buf, self.ns, 0, -1)
   for _, h in ipairs(b.hls) do vim.api.nvim_buf_add_highlight(self.buf, self.ns, h[2], h[1] - 1, 0, -1) end
+  for _, s in ipairs(b.spans or {}) do vim.api.nvim_buf_add_highlight(self.buf, self.ns, s[4], s[1] - 1, s[2], s[3]) end
   self.meta, self.heads, self.jumps, self.lines = b.meta, b.heads, b.jumps, b.lines
   return b
 end
@@ -219,15 +343,17 @@ function Page:open()
     self.win = vim.api.nvim_get_current_win(); self:render(); self:mark(); return self
   end
   self.win = editing_window(); vim.api.nvim_set_current_win(self.win)
+  local stale = vim.fn.bufnr("^" .. spec.name .. "$")      -- a deleted-but-not-yet-wiped copy would make set_name fail (E95)
+  if stale > 0 then pcall(vim.api.nvim_buf_delete, stale, { force = true }) end
   self.buf = vim.api.nvim_create_buf(true, true)
   vim.api.nvim_buf_set_name(self.buf, spec.name)
-  vim.bo[self.buf].buftype = "nofile"; vim.bo[self.buf].bufhidden = "wipe"; vim.bo[self.buf].swapfile = false
+  vim.bo[self.buf].buftype = "nofile"; vim.bo[self.buf].bufhidden = "hide"; vim.bo[self.buf].swapfile = false -- hide: opening another page keeps this one as a tab
   vim.bo[self.buf].filetype = spec.ft
   local old = vim.api.nvim_win_get_buf(self.win)
   vim.api.nvim_win_set_buf(self.win, self.buf)
   if old ~= self.buf and vim.api.nvim_buf_is_valid(old) and vim.api.nvim_buf_get_name(old) == "" and not vim.bo[old].modified and vim.api.nvim_buf_line_count(old) <= 1
     and vim.api.nvim_buf_get_lines(old, 0, -1, false)[1] == "" then pcall(vim.api.nvim_buf_delete, old, { force = true }) end
-  for k, v in pairs({ cursorline = true, wrap = false, number = false, relativenumber = false, signcolumn = "no", list = false, spell = false, foldenable = false, scrolloff = 0 }) do vim.wo[self.win][k] = v end
+  M.setwo(self.win, PAGE_WINOPTS)
   M.install_click_handler()
   self:render()
   self:setcur(spec.start_line and spec.start_line(self) or 1); self:mark()
@@ -245,6 +371,16 @@ function Page:open()
   local g = vim.api.nvim_create_augroup("ide-page-" .. spec.ft, { clear = true })
   vim.api.nvim_create_autocmd("CursorMoved", { group = g, buffer = self.buf, callback = function() self:mark() end })
   vim.api.nvim_create_autocmd({ "VimResized", "WinResized" }, { group = g, callback = function() if self:valid() then self:render(); self:mark() end end })
+  -- Coming back to a hidden page (tab click, :b) may be in a different window: follow it.
+  vim.api.nvim_create_autocmd("BufWinEnter", { group = g, buffer = self.buf, callback = function()
+    self.win = vim.api.nvim_get_current_win()
+    M.setwo(self.win, PAGE_WINOPTS)
+    vim.schedule(function() if self:valid() then self:render(); self:mark() end end)
+  end })
+  -- :bd only unloads/unlists; a page has no file behind it, so wipe it for real (and forget it) when it is deleted.
+  vim.api.nvim_create_autocmd("BufDelete", { group = g, buffer = self.buf, callback = function(a)
+    vim.schedule(function() if vim.api.nvim_buf_is_valid(a.buf) then pcall(vim.api.nvim_buf_delete, a.buf, { force = true }) end end)
+  end })
   vim.api.nvim_create_autocmd("BufWipeout", { group = g, buffer = self.buf, callback = function() self.buf = nil end })
   return self
 end

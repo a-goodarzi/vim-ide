@@ -52,10 +52,10 @@ local page = ui.page({
     b:jumpbar(sections)
 
     b:head(sections[1], 1)
-    for _, a in ipairs(actions) do
-      local first = #b.lines + 1
-      b:add(b.margin .. "  " .. a.label, "IDEAccent", { action = a, first = first, last = first + 1 })
-      b:add(b.margin .. "  " .. a.desc, "IDEMuted", { action = a, first = first, last = first + 1 })
+    local accents = { "IDEAccent", "IDEOn", "IDEWarn", "IDEInfo", "IDEKey", "Special" }
+    for i, a in ipairs(actions) do
+      local first, last = b:card({ title = a.label, accent = accents[(i - 1) % #accents + 1], meta = { action = a }, lines = { { a.desc, "IDEMuted" } } })
+      for l = first, last do b.meta[l].first, b.meta[l].last = first, last end
       b:blank()
     end
 

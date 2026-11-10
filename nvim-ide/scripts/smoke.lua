@@ -55,7 +55,7 @@ vim.api.nvim_win_set_cursor(0, { line_of("Statusline style"), 0 })
 vim.api.nvim_feedkeys(vim.keycode("<CR>"), "x", false)
 check("keyboard toggle changes value", cfg.settings.statusline_style ~= before)
 check("keyboard toggle persists to json", (cfg.load_overrides().statusline_style or "") == cfg.settings.statusline_style)
-check("changed setting is marked with ●", text():find("● Statusline style", 1, true) ~= nil)
+check("changed setting is marked as changed on its card", (function() local l = vim.api.nvim_buf_get_lines(0, line_of("Statusline style") - 1, line_of("Statusline style"), false)[1] or "" return l:find("changed", 1, true) ~= nil end)())
 -- mouse (getmousepos is stubbed: headless nvim has no real screen)
 local trow = line_of("Transparent background")
 local t0 = cfg.settings.transparent

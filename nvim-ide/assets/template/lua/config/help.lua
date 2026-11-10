@@ -127,8 +127,10 @@ local page = ui.page({
     }) do b:add(b.margin .. ui.g("bullet") .. l) end
 
     b:head(sections[2], 2)
-    for _, f in ipairs(features) do
-      b:add(b.margin .. f[1], "IDEAccent"); b:add(b.margin .. "  " .. f[2]); b:add(b.margin .. "  " .. f[3], "IDEMuted"); b:blank()
+    local accents = { "IDEAccent", "IDEOn", "IDEWarn", "IDEInfo", "IDEKey", "Special" }
+    for i, f in ipairs(features) do
+      b:card({ title = f[1], accent = accents[(i - 1) % #accents + 1], lines = { { f[2] }, { f[3], "IDEMuted" } } })
+      b:blank()
     end
 
     b:head(sections[3], 3)

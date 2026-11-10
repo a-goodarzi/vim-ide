@@ -166,19 +166,6 @@ local function changed(item, ov)
   return get(ov, item.key) ~= nil
 end
 
-local function control_text(item)
-  if item.type == "bool" then
-    local on = current(item)
-    return ui.g(on and "on" or "off") .. (on and "Enabled" or "Disabled"), on and "IDEOn" or "IDEMuted"
-  elseif item.type == "enum" then
-    return ui.g("chev_l") .. tostring(current(item)) .. ui.g("chev_r") .. "   (Enter: next option)", "String"
-  elseif item.type == "number" then return tostring(current(item)) .. "   (Enter: edit)", "Number"
-  else
-    local v = current(item)
-    return ((v == nil or v == "") and "(not set)" or tostring(v)) .. "   (Enter: edit)", "String"
-  end
-end
-
 local page
 local cat_names = {}
 for _, c in ipairs(categories) do cat_names[#cat_names + 1] = c.name end
@@ -223,6 +210,47 @@ local function next_block(p, d)
   if target then p:setcur(target); p:mark() end
 end
 
+-- one accent per section and an icon, so each part of the page is recognisable at a glance
+local accents = { "IDEAccent", "IDEOn", "IDEWarn", "IDEInfo", "IDEKey", "Special" }
+local cat_style = {
+  ["Appearance"] = { icon = "\xef\x87\xbc" }, ["VS Code layout"] = { icon = "\xef\x83\x9b" }, ["Layout"] = { icon = "\xef\x80\x89" },
+  ["Claude Code"] = { icon = "\xef\x81\xa9" }, ["Features"] = { icon = "\xef\x82\x85" }, ["Editor"] = { icon = "\xef\x81\x84" },
+  ["Languages"] = { icon = "\xef\x84\xa1" },
+}
+
+--- The control as one line of chips: a switch, the options of an enum (the current one filled) or an input box.
+--- Returns text, spans (byte offsets in the text) and, for enums, clickable chips { from, to, value }.
+local function control_row(it)
+  local text, spans, chips = "", {}, nil
+  local function seg(s, hl, value)
+    if hl then spans[#spans + 1] = { #text, #text + #s, hl } end
+    if value ~= nil then chips = chips or {}; chips[#chips + 1] = { from = #text, to = #text + #s, value = value } end
+    text = text .. s
+  end
+  if it.type == "bool" then
+    local on = current(it)
+    seg(on and " \xe2\x97\x8f ON  " or " \xe2\x97\x8b OFF ", on and "IDEChipOn" or "IDEChipOff"); seg("   Enter / click toggles", "IDEMuted")
+  elseif it.type == "enum" then
+    local vs, cur = it.values, current(it)
+    local idx = 1
+    for i, v in ipairs(vs) do if v == cur then idx = i end end
+    if #vs <= 5 then
+      for _, v in ipairs(vs) do seg(" " .. tostring(v) .. " ", v == cur and "IDEChipSel" or "IDEChip", v); seg(" ") end
+      seg("  Enter: next", "IDEMuted")
+    else      -- a long list (themes): the previous and next option around the current one, click either to jump
+      local prev, nxt = vs[(idx - 2) % #vs + 1], vs[idx % #vs + 1]
+      seg(" \xe2\x80\xb9 " .. tostring(prev) .. " ", "IDEChip", prev); seg(" ")
+      seg(" " .. tostring(cur) .. " ", "IDEChipSel", cur); seg(" ")
+      seg(" " .. tostring(nxt) .. " \xe2\x80\xba ", "IDEChip", nxt)
+      seg(("   %d / %d   Enter: next"):format(idx, #vs), "IDEMuted")
+    end
+  else
+    local v = current(it)
+    seg(" " .. ((v == nil or v == "") and "(not set)" or tostring(v)) .. " ", "IDEChip"); seg("   Enter: edit", "IDEMuted")
+  end
+  return text, spans, chips
+end
+
 page = ui.page({
   name = "Settings", ft = "ide-settings", sections = cat_names,
   render = function(_, b)
@@ -238,23 +266,34 @@ page = ui.page({
       local items = {}
       for _, it in ipairs(cat.items) do if not searching or matches(it, filter) then items[#items + 1] = it end end
       if #items > 0 then
-        b:head(cat.name, ci)
+        local style = cat_style[cat.name] or {}
+        local accent = accents[(ci - 1) % #accents + 1]
+        b:head(cat.name, ci, { icon = cfg.icons() and style.icon or nil, accent = accent })
         local compact = cat.name == "Languages"
         for _, it in ipairs(items) do
           shown = shown + 1
-          local dot = changed(it, ov) and ui.g("changed") or "  "
-          local mark = (it.restart and not it.live) and ("  " .. ui.g("restart")) or ""
+          local is_changed = changed(it, ov)
+          local needs_restart = it.restart and not it.live
           if compact then
+            local on = lang_on(it.name)
             local first = #b.lines + 1
-            b:add(b.margin .. dot .. ui.g(lang_on(it.name) and "on" or "off") .. string.format("%-14s", it.label) .. "  " .. (it.desc or "") .. mark,
-              lang_on(it.name) and nil or "IDEMuted", { item = it, kind = "control", first = first, last = first })
+            local chip = on and " \xe2\x97\x8f " or " \xe2\x97\x8b "
+            local label = string.format("%-14s", it.label)
+            local text = b.margin .. (is_changed and ui.g("changed") or "  ") .. chip .. " " .. label .. "  " .. (it.desc or "") .. (needs_restart and ("  " .. ui.g("restart")) or "")
+            local l = b:add(text, on and nil or "IDEMuted", { item = it, kind = "control", first = first, last = first })
+            local c0 = #b.margin + #(is_changed and ui.g("changed") or "  ")
+            b:span(l, c0, c0 + #chip, on and "IDEChipOn" or "IDEChipOff")
+            if on then b:span(l, c0 + #chip + 1, c0 + #chip + 1 + #label, accent) end
           else
-            local first = #b.lines + 1
-            local info = { item = it, first = first, last = first + 2 }
-            b:add(b.margin .. dot .. it.label .. mark, "IDEAccent", vim.tbl_extend("force", info, { kind = "title" }))
-            b:add(b.margin .. "  " .. (it.desc or ""), "IDEMuted", vim.tbl_extend("force", info, { kind = "desc" }))
-            local ctext, chl = control_text(it)
-            b:add(b.margin .. "  " .. ctext, chl, vim.tbl_extend("force", info, { kind = "control" }))
+            local ctext, spans, chips = control_row(it)
+            local tag
+            if is_changed and needs_restart then tag = { ui.g("changed") .. "changed  " .. ui.g("restart") .. " restart", "IDEChipWarn" }
+            elseif is_changed then tag = { ui.g("changed") .. "changed", "IDEChipWarn" }
+            elseif needs_restart then tag = { ui.g("restart") .. " needs restart", "IDEChipInfo" } end
+            local first, last = b:card({ title = it.label, accent = accent, tag = tag, meta = { item = it, kind = "title" },
+              lines = { { it.desc or "", "IDEMuted", meta = { kind = "desc" } }, { ctext, nil, nowrap = true, spans = spans, meta = { kind = "control", chips = chips } } } })
+            for l = first, last do b.meta[l].first, b.meta[l].last = first, last end
+            if chips then for _, ch in ipairs(chips) do ch.from, ch.to = ch.from + #b.margin + 4, ch.to + #b.margin + 4 end end   -- "│ " = 4 bytes before the text
             b:blank()
           end
         end
@@ -268,7 +307,18 @@ page = ui.page({
   end,
   select = function(p, line) local m = p.meta[line]; if m and m.item then return m.first, m.last end end,
   start_line = function(p) return block_lines(p)[1] or 1 end,
-  click = function(p, _, meta) if meta and meta.item and meta.kind == "control" then activate(p, meta.item) end end,
+  click = function(p, m, meta)
+    if not (meta and meta.item and meta.kind == "control") then return end
+    if meta.chips and m and m.column then      -- a click on one option of an enum picks that option
+      for _, ch in ipairs(meta.chips) do
+        if m.column - 1 >= ch.from and m.column - 1 < ch.to then
+          local line = p:line()
+          apply(meta.item, ch.value); p:render(); p:setcur(line); p:mark(); return
+        end
+      end
+    end
+    activate(p, meta.item)
+  end,
   keys = {
     ["<CR>"] = function(p) local m = p.meta[p:line()]; activate(p, m and m.item) end,
     ["<Space>"] = function(p) local m = p.meta[p:line()]; activate(p, m and m.item) end,

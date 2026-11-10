@@ -89,7 +89,14 @@ local page = ui.page({
     b:title("Doctor", "What the IDE needs. r re-runs the check, y copies the install command, q closes.")
     local sym = { ok = "\xe2\x9c\x93", warn = "!", fail = "\xe2\x9c\x97" }
     local hl = { ok = "IDEOn", warn = "IDEWarn", fail = "DiagnosticError" }
-    for _, r in ipairs(res) do b:add(("%s%s  %-30s %s"):format(b.margin, sym[r.level], r.name, r.detail), hl[r.level]) end
+    local chip = { ok = " \xe2\x9c\x93 ok ", warn = " ! warn ", fail = " \xe2\x9c\x97 missing " }
+    local chip_hl = { ok = "IDEChipOn", warn = "IDEChipWarn", fail = "IDEChipErr" }
+    for _, r in ipairs(res) do
+      local c = chip[r.level]
+      local l = b:add(b.margin .. ui.pad(c, 11) .. "  " .. ui.pad(r.name, 30) .. " " .. r.detail)
+      b:span(l, #b.margin, #b.margin + #c, chip_hl[r.level])
+      if r.level ~= "ok" then b:span(l, #b.margin + 11 + 2 + 30 - 0, -1, hl[r.level]) end
+    end
     b:blank()
     if cmd ~= "" then
       b:add(b.margin .. "Install what is missing:", "IDEHeading"); b:add(b.margin .. "  " .. cmd, "IDEKey"); b:add(b.margin .. "  (y copies it)", "IDEMuted")

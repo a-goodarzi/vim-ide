@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.26.0 - Card-style Settings, Help and Plugins
+
+Every setting is its own rounded card: a coloured title and status tag (changed / needs restart), a switch for on/off, filled option chips for choices (click one to pick it) and an input box for values. Sections get an icon and their own accent colour. Help topics, Plugins actions and the Doctor use the same cards and status chips (new builder helpers: card, span, chips).
+
 ## 0.25.1 - Find tools your shell knows
 
 When nvim cannot find a tool (tree-sitter, node, rg ...) it now asks your interactive login shell where it is (nvm, mise, asdf and custom Homebrew prefixes) and adds that folder to its PATH. A new extra_path setting lists folders by hand. The tree-sitter warning is shorter and tells you what to check.
