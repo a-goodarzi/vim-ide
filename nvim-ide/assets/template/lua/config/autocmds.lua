@@ -76,6 +76,9 @@ lazycmd("IDELayoutSave", "config.layout", "?"); lazycmd("IDELayoutLoad", "config
 -- Task runner
 lazycmd("IDETasks", "config.tasks"); lazycmd("IDETaskLast", "config.tasks")
 
+-- Remote and containers
+lazycmd("IDERemote", "config.remote"); lazycmd("IDEContainers", "config.remote")
+
 -- Snippets browser
 lazycmd("IDESnippets", "config.assist")
 

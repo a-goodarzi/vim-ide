@@ -41,6 +41,7 @@ local sections = {
     { "<Space>se", "Equalize splits" }, { "palette: Layout", "Save / load named layouts (:IDELayoutSave, :IDELayoutLoad)" } } },
   { "Tasks", { { "<Space>rt / rr", "Run a project task / run the last one again" } } },
   { "Sessions & projects", { { "palette: Recent projects", "Switch project (files reopen on start)" }, { ":IDESessionSave", "Save the session now" } } },
+  { "Remote", { { "palette: Remote", "SSH shell, scp file, container shell" } } },
   { "Snippets & Claude", { { "<Space>cS", "Browse snippets" }, { "<Space>aq", "Ask Claude about the selection / file" } } },
   { "Explorer extras", { { "T / gy / gY / gO / gs", "Terminal here / copy path / relative path / system file manager / search in folder" } } },
   { "Terminal", { { "Ctrl-\\", "Floating terminal" }, { "Alt-t / <Space>tt", "Terminal panel (also the top-right button)" } } },

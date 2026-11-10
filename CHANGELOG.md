@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.0 - Remote and containers
+
+SSH shell, edit a remote file over scp, shell in a running container or the folder's dev container.
+
 ## 0.12.0 - Snippets and Claude on a selection
 
 Snippet browser for the current file type and an action that sends the selection or file to Claude.
