@@ -20,6 +20,7 @@ works inside tmux, and every screen shares one design system.
 - **Task runner:** Finds Makefile targets, npm scripts, go, pytest, cargo, terraform, justfile and .vscode tasks and runs them in the terminal panel (`<Space>rt`, `<Space>rr`).
 - **Test runner:** Run all / last / stop keys and palette entries for neotest, with pass and fail marks in the gutter.
 - **Explorer actions:** Terminal in the folder, copy path, open in the system file manager and search inside a folder from the Explorer.
+- **Problems panel:** The Problems panel groups diagnostics by file with counts and takes focus when opened.
 
 ## Screenshots
 

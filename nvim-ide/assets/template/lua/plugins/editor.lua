@@ -62,7 +62,9 @@ return {
     keys = { { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash jump" } } },
 
   -- Diagnostics list ------------------------------------------------------
-  { "folke/trouble.nvim", cmd = "Trouble", opts = {},
+  { "folke/trouble.nvim", cmd = "Trouble", opts = {
+      focus = true, auto_close = false, warn_no_results = false, open_no_results = true,
+      modes = { diagnostics = { groups = { { "filename", format = "{file_icon} {basename:Title} {count}" } }, auto_preview = false } } },
     keys = {
       { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Workspace diagnostics" },
       { "<leader>xb", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer diagnostics" },

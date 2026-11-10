@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.0 - Problems panel
+
+The Problems panel groups diagnostics by file with counts and takes focus when opened.
+
 ## 0.10.0 - Explorer actions
 
 Terminal in the folder, copy path, open in the system file manager and search inside a folder from the Explorer.
