@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.0 - Contribution docs
+
+CONTRIBUTING.md, a guide to adding a language, theme or feature, issue and pull request templates.
+
 ## 0.19.0 - Small fixes
 
 Clicking the active Plugins icon closes the Plugins page like the other views hide their sidebar, and the minimap steps aside for full-screen pages (Settings, Help, Plugins) instead of drawing over them.

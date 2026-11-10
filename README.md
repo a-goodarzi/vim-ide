@@ -112,6 +112,10 @@ For tmux, add `nvim-ide/assets/template/extras/tmux.conf` to your tmux config (t
 
 The two skills are also provided as `nvim-ide.skill` and `nvim-tui-ux.skill`, which can be installed in Claude.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/ADDING.md](docs/ADDING.md) (how to add a language, a theme or a feature). The ideas queue is in [ROADMAP.md](ROADMAP.md).
+
 ## Development
 
 ```sh
