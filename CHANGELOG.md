@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.0 - Test runner
+
+Run all / last / stop keys and palette entries for neotest, with pass and fail marks in the gutter.
+
 ## 0.8.0 - Task runner
 
 Finds Makefile targets, npm scripts, go, pytest, cargo, terraform, justfile and .vscode tasks and runs them in the terminal panel (`<Space>rt`, `<Space>rr`).

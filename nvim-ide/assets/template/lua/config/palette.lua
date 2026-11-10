@@ -31,6 +31,11 @@ M.items = {
   { "Layout", "Load a saved layout...", "", function() require("config.layout").pick_load() end },
   { "Run", "Run task...", "<Space>rt", cmd("IDETasks") },
   { "Run", "Run the last task again", "<Space>rr", cmd("IDETaskLast") },
+  { "Test", "Run nearest test", "<Space>tn", function() require("neotest").run.run() end },
+  { "Test", "Run tests in file", "<Space>tf", function() require("neotest").run.run(vim.fn.expand("%")) end },
+  { "Test", "Run all tests", "<Space>tA", function() require("neotest").run.run(vim.fn.getcwd()) end },
+  { "Test", "Run last test again", "<Space>tl", function() require("neotest").run.run_last() end },
+  { "Test", "Test summary", "<Space>ts", function() require("neotest").summary.toggle() end },
   { "Search", "Search text in files", "<Space>fg", tele("live_grep") },
   { "Search", "Search & Replace sidebar", "Alt-f", ab("search") },
   { "Search", "Go to symbol in file", "<Space>o", tele("lsp_document_symbols") },
@@ -68,6 +73,11 @@ M.items = {
   { "Git", "Switch or create branch...", "", function() require("config.scm").branches() end },
   { "", "All Vim commands...", "", tele("commands") },
 }
+if not require("config").feature("test") then
+  local keep = {}
+  for _, it in ipairs(M.items) do if it[1] ~= "Test" then keep[#keep + 1] = it end end
+  M.items = keep
+end
 if not require("config").feature("debug") then   -- Debugger switched off in Settings: no debug entries
   local keep = {}
   for _, it in ipairs(M.items) do if it[1] ~= "Debug" and it[2] ~= "Run & Debug" then keep[#keep + 1] = it end end

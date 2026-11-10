@@ -35,7 +35,7 @@ local sections = {
     { "<Space>gb", "Blame line" }, { "<Space>gv", "Diff view" }, { "<Space>tg", "Lazygit" } } },
   { "Debug & test", {
     { "<Space>db", "Breakpoint" }, { "<Space>dc", "Continue / start" }, { "<Space>di / do / dO", "Step into / over / out" },
-    { "<Space>du", "Debug UI" }, { "<Space>tn / tf", "Run nearest / file tests" }, { "<Space>ts", "Test summary" } } },
+    { "<Space>du", "Debug UI" }, { "<Space>tn / tf", "Run nearest / file tests" }, { "<Space>tA / tl", "Run all / last tests" }, { "<Space>ts", "Test summary" } } },
   { "Splits & layout", {
     { "<Space>sv / sh", "Split right / below" }, { "<Space>sx", "Close split" }, { "<Space>sm", "Maximize / restore split" },
     { "<Space>se", "Equalize splits" }, { "palette: Layout", "Save / load named layouts (:IDELayoutSave, :IDELayoutLoad)" } } },
