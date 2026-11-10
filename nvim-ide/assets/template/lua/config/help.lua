@@ -57,6 +57,8 @@ local features = {
     "Ctrl-Space open · Ctrl-n / Ctrl-p select · Ctrl-y accept · Ctrl-e close" },
   { "Formatting & linting", "Format on save with the right tool per language; linters run in the background.",
     "<Space>cf format now · :FormatToggle turn format-on-save off/on · :ConformInfo shows the formatter in use" },
+  { "Shortcuts", "Change any VS Code-style key: pick the row, press the new key. It applies at once and is saved.",
+    ":IDEShortcuts · <Space>uk · K on the Settings page · Enter change · d unbind · r default · R reset all" },
   { "Git", "Change marks in the gutter, hunk staging, blame, diff view, lazygit.",
     "]h / [h next/prev hunk · <Space>gs stage · gr reset · gp preview · gb blame · gv diff view · tg lazygit" },
   { "Debugger", "Breakpoints, stepping and a variables panel (nvim-dap). Switch it off in Settings > Features > Debugger.",

@@ -28,6 +28,7 @@ for _, k in ipairs(require("config").settings.keymaps or {}) do map(k[1], k[2], 
 -- ── Settings, help, plugin manager ──────────────────────────────────────────
 map("n", "<leader>us", function() require("config.settings_ui").open() end, "Settings page")
 map("n", "<leader>?", function() require("config.cheatsheet").open() end, "Commands & shortcuts")
+map("n", "<leader>uk", function() require("config.shortcuts").open() end, "Customize shortcuts")
 map("n", "<leader>pl", function() require("config.plugins_ui").open() end, "Plugins tab")
 map("n", "<leader>pL", "<cmd>Lazy<cr>", "Full lazy.nvim UI (advanced)")
 vim.api.nvim_create_user_command("IDEPlugins", function() require("config.plugins_ui").open() end, {})
@@ -37,6 +38,7 @@ map("n", "<leader>pm", "<cmd>Mason<cr>", "Language servers & tools (Mason)")
 map("n", "<leader>ph", "<cmd>checkhealth<cr>", "Health check")
 -- Commands exist even before their modules are loaded:
 vim.api.nvim_create_user_command("IDESettings", function() require("config.settings_ui").open() end, {})
+vim.api.nvim_create_user_command("IDEShortcuts", function() require("config.shortcuts").open() end, { desc = "Customize shortcuts" })
 vim.api.nvim_create_user_command("IDEHelp", function() require("config.cheatsheet").open() end, {})
 
 -- ── Tab pages and terminal-friendly navigation ──────────────────────────────

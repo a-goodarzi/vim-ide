@@ -309,7 +309,7 @@ page = ui.page({
     b:blank(); b:rule()
     local pending = vim.tbl_keys(restart_needed); table.sort(pending)
     if #pending > 0 then b:add(b.margin .. ui.g("restart") .. " Restart needed for: " .. table.concat(pending, ", ") .. "   (press A to restart now)", "IDEWarn")
-    else b:add(b.margin .. "Saved to " .. cfg.override_path, "IDEMuted") end
+    else b:add(b.margin .. "Saved to " .. cfg.override_path .. "   (K customizes shortcuts)", "IDEMuted") end
   end,
   select = function(p, line) local m = p.meta[line]; if m and m.item then return m.first, m.last end end,
   start_line = function(p) return block_lines(p)[1] or 1 end,
@@ -342,6 +342,7 @@ page = ui.page({
         if c == "Reset ALL settings" then cfg.save_overrides({}); restart_needed["everything"] = true; vim.notify("Settings reset. Restart nvim."); p:render() end
       end)
     end,
+    K = function() require("config.shortcuts").open() end,
     A = function()
       if vim.env.IDE_SETTINGS_ONLY then return vim.cmd("qa!") end
       if vim.fn.exists(":restart") == 2 then vim.cmd("restart") else vim.notify("Quit and reopen nvim to apply (in-place restart needs nvim 0.12).") end

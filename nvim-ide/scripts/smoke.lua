@@ -694,5 +694,27 @@ do -- focusing the Claude panel enters insert mode (a real terminal cannot be dr
   check("an autocmd starts insert mode when the Claude terminal is entered", found)
 end
 
+do -- customizable shortcuts
+  local S = require("config.shortcuts")
+  local it
+  for _, i in ipairs(S.items) do if i.default == "<A-b>" then it = i end end
+  check("vscode keys register with the shortcut list", it ~= nil and #S.items > 20)
+  if it then
+    local ov0 = vim.deepcopy(require("config").load_overrides())
+    S.owner("<A-b>"); vim.cmd("IDEShortcuts"); vim.wait(300)
+    check("the Shortcuts page opens", vim.bo.filetype == "ide-shortcuts")
+    vim.cmd("bwipeout!")
+    S.set(it, "<A-k>")
+    check("a rebound key is mapped and the old one is gone", vim.fn.maparg("<A-k>", "n") ~= "" and vim.fn.maparg("<A-b>", "n") == "" and S.owner("<A-k>") == it)
+    check("the choice is saved", require("config").load_overrides().shortcuts["<A-b>"] == "<A-k>")
+    S.set(it, false)
+    check("an unbound shortcut has no key", it.key == nil and vim.fn.maparg("<A-k>", "n") == "")
+    S.reset_all()
+    check("reset_all restores the default key", it.key == "<A-b>" and vim.fn.maparg("<A-b>", "n") ~= "")
+    local ov = require("config").load_overrides(); check("nothing is left in the saved settings", ov.shortcuts == nil)
+    require("config").save_overrides(ov0)
+  end
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")

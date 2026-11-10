@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.31.0 - Customizable shortcuts
+
+A Shortcuts page lists every VS Code-style key. Press Enter on a row and then the new key to change it, d to unbind, r to restore the default. Open it with :IDEShortcuts, <Space>uk, the palette or K on the Settings page. Choices apply at once and are saved in the settings file. A key already in use is refused.
 ## 0.30.4 - Claude panel opens in insert mode
 
 The panel was opening in normal mode (you had to press i); it now enters insert mode when created and when you move into it. The minimap no longer stays drawn on top of the panel (it is hidden once the panel is recognised).
