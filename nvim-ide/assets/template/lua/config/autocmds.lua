@@ -60,6 +60,11 @@ end
 vim.api.nvim_create_user_command("IDEDoctor", function() require("config.doctor").open() end, { desc = "Check the tools the IDE needs" })
 vim.api.nvim_create_user_command("IDEWelcome", function() require("config.welcome").open() end, { desc = "Open the welcome / first-run check" })
 
+-- Right-click menus
+if require("config").feature("context_menu") and not standalone then
+  vim.api.nvim_create_autocmd("VimEnter", { group = group, once = true, callback = function() require("config.context_menu").setup() end })
+end
+
 -- Session restore + recent projects. Commands of lazily loaded modules get a stub: the first call loads the module (which
 -- redefines the command) and repeats it.
 local function lazycmd(name, mod, nargs)

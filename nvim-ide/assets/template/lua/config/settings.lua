@@ -24,6 +24,7 @@ return {
     minimap = false,       -- code minimap on the right
     tabs = true,           -- tab bar (config/tabs.lua): open files shown as tabs
     explorer_on_start = true, -- open the file browser sidebar at launch
+    context_menu = true,   -- right-click menus in the editor and the Explorer
     session_restore = true, -- reopen the last session's files when you start `ide` in a folder with no file argument
     welcome = true,        -- show the first-run welcome (icon check, doctor, first keys) once
     dashboard = true,      -- welcome screen with shortcuts

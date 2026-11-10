@@ -319,8 +319,8 @@ do
   vim.cmd("cd " .. vim.fn.fnameescape(dir))
   local scm = require("config.scm")
   ABv.setup(); vim.wait(300)
-  ABv.show("git"); vim.wait(1500, function() return #scm.state.untracked == 1 end)
-  check("scm lists an untracked file", #scm.state.untracked == 1, vim.inspect(scm.state))
+  ABv.show("git"); vim.wait(2500, function() return scm.root == vim.uv.fs_realpath(dir) and #scm.state.untracked == 1 end)   -- the repo this test runs in may have untracked files of its own
+  check("scm lists an untracked file", #scm.state.untracked == 1)
   scm.stage({ file = { path = "a.txt", code = "?" } })
   vim.wait(1500, function() return #scm.state.staged == 1 end)
   check("scm stage moves the file to Staged", #scm.state.staged == 1)
@@ -449,6 +449,22 @@ do
   check("palette lists the most recently used entry first", pal.entries()[1][1] == "Recent" and pal.entries()[1][2] == "Save")
   if keep then local r = io.open(vim.fn.stdpath("data") .. "/ide-palette-recent.json", "w"); r:write(keep); r:close()
   else os.remove(vim.fn.stdpath("data") .. "/ide-palette-recent.json") end
+end
+
+-- Right-click menus: item lists, the generic menu and mouse hook
+do
+  local CM = require("config.context_menu")
+  check("editor context menu has LSP and clipboard rows", #CM.editor_items(false) >= 8 and #CM.editor_items(true) > #CM.editor_items(false))
+  vim.cmd("enew")
+  local ui = require("config.ui")
+  local hit = 0
+  local win = ui.menu({ { "One", function() hit = 1 end }, "-", { "Two", function() hit = 2 end } }, { row = 2, col = 2 })
+  vim.wait(50)
+  check("ui.menu opens a floating menu", vim.api.nvim_win_get_config(win).relative == "editor")
+  vim.api.nvim_feedkeys(vim.keycode("jj<CR>"), "x", false); vim.wait(200)
+  check("ui.menu skips separators and runs the chosen row", hit == 2, hit)
+  CM.setup()
+  check("right-click is mapped", vim.fn.maparg("<RightMouse>", "n", false, true).desc == "Context menu")
 end
 
 print(string.format("\n%d passed, %d failed", passes, #fails))

@@ -24,6 +24,7 @@ works inside tmux, and every screen shares one design system.
 - **Snippets and Claude on a selection:** Snippet browser for the current file type and an action that sends the selection or file to Claude.
 - **Remote and containers:** SSH shell, edit a remote file over scp, shell in a running container or the folder's dev container.
 - **Smarter command palette:** The palette lists recently used entries first and adds your project tasks, recent projects, git actions and one entry per theme.
+- **Right-click menus:** Right-click in the editor or on an Explorer entry opens a context menu (definition, references, rename, format, clipboard, Claude, split; open, new, rename, delete, copy path, terminal here). One shared menu widget now also powers the tab menu. Also fixes a late Source Control refresh overwriting a newer one.
 
 ## Screenshots
 

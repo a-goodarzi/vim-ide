@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.15.0 - Right-click menus
+
+Right-click in the editor or on an Explorer entry opens a context menu (definition, references, rename, format, clipboard, Claude, split; open, new, rename, delete, copy path, terminal here). One shared menu widget now also powers the tab menu. Also fixes a late Source Control refresh overwriting a newer one.
+
 ## 0.14.0 - Smarter command palette
 
 The palette lists recently used entries first and adds your project tasks, recent projects, git actions and one entry per theme.

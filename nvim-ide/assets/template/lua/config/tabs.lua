@@ -298,27 +298,7 @@ function M.menu(buf)
       pcall(vim.cmd, "Neotree reveal left")
     end }
   end
-  local m = vim.fn.getmousepos()
-  local lines, w = {}, 0
-  for _, it in ipairs(items) do lines[#lines + 1] = "  " .. it[1] .. "  "; w = math.max(w, vim.fn.strdisplaywidth(lines[#lines])) end
-  local b = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_lines(b, 0, -1, false, lines)
-  vim.bo[b].bufhidden = "wipe"
-  local col = math.max(0, math.min((m.screencol or 1) - 1, vim.o.columns - w - 2))
-  local win = vim.api.nvim_open_win(b, true, { relative = "editor", row = 1, col = col, width = w, height = #lines,
-    style = "minimal", border = ui.border, focusable = true, zindex = 80 })
-  ui.setwo(win, { cursorline = true, winhighlight = "NormalFloat:NormalFloat,CursorLine:Visual,FloatBorder:IDERule" })
-  local function close() if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end end
-  local function run(i) local it = items[i]; close(); if it then vim.schedule(it[2]) end end
-  local k = function(lhs, fn) vim.keymap.set("n", lhs, fn, { buffer = b, nowait = true, silent = true }) end
-  k("<CR>", function() run(vim.api.nvim_win_get_cursor(win)[1]) end)
-  k("<Esc>", close); k("q", close)
-  k("<LeftMouse>", function()
-    local p = vim.fn.getmousepos()
-    if p.winid == win then run(p.line) else close() end
-  end)
-  k("<RightMouse>", close)
-  vim.api.nvim_create_autocmd("WinLeave", { buffer = b, once = true, callback = close })
+  ui.menu(items)
 end
 
 return M

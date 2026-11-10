@@ -81,6 +81,51 @@ function M.install_click_handler()
   end, { expr = true, desc = "Click (IDE UI aware)" })
 end
 
+-- ── context menu ───────────────────────────────────────────────────────────────────────────────────
+--- Small floating menu at the mouse (or the cursor). items = { { "Label", fn }, ..., "-" = separator }.
+--- j/k and Enter or a click choose; Esc, q, a right-click or a click elsewhere closes it.
+function M.menu(items, opts)
+  opts = opts or {}
+  local rows, lines, w = {}, {}, 0
+  for _, it in ipairs(items) do
+    if it == "-" then rows[#rows + 1] = false else rows[#rows + 1] = it end
+  end
+  for _, r in ipairs(rows) do
+    lines[#lines + 1] = r and ("  " .. r[1] .. "  ") or ""
+    w = math.max(w, vim.fn.strdisplaywidth(lines[#lines]))
+  end
+  for i, r in ipairs(rows) do if not r then lines[i] = string.rep(M.RULE, w) end end
+  local m = vim.fn.getmousepos()
+  local b = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(b, 0, -1, false, lines)
+  vim.bo[b].bufhidden = "wipe"
+  local row = opts.row or math.max(0, math.min((m.screenrow or 2), vim.o.lines - #lines - 3))
+  local col = opts.col or math.max(0, math.min((m.screencol or 1) - 1, vim.o.columns - w - 2))
+  local win = vim.api.nvim_open_win(b, true, { relative = "editor", row = row, col = col, width = w, height = #lines,
+    style = "minimal", border = M.border, zindex = 80 })
+  M.setwo(win, { cursorline = true, winhighlight = "FloatBorder:IDERule,CursorLine:Visual" })
+  for i, r in ipairs(rows) do if not r then vim.api.nvim_buf_add_highlight(b, -1, "IDERule", i - 1, 0, -1) end end
+  local function first() for i, r in ipairs(rows) do if r then return i end end end
+  pcall(vim.api.nvim_win_set_cursor, win, { first() or 1, 0 })
+  local function close() if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end end
+  local function run(i) local it = rows[i]; close(); if it then vim.schedule(it[2]) end end
+  local function step(d)
+    local i = vim.api.nvim_win_get_cursor(win)[1]
+    repeat i = i + d until rows[i] or i < 1 or i > #rows
+    if rows[i] then vim.api.nvim_win_set_cursor(win, { i, 0 }) end
+  end
+  local k = function(lhs, fn) vim.keymap.set("n", lhs, fn, { buffer = b, nowait = true, silent = true }) end
+  k("<CR>", function() run(vim.api.nvim_win_get_cursor(win)[1]) end)
+  k("j", function() step(1) end); k("k", function() step(-1) end); k("<Down>", function() step(1) end); k("<Up>", function() step(-1) end)
+  k("<Esc>", close); k("q", close); k("<RightMouse>", close)
+  k("<LeftMouse>", function()
+    local p = vim.fn.getmousepos()
+    if p.winid == win then run(p.line) else close() end
+  end)
+  vim.api.nvim_create_autocmd("WinLeave", { buffer = b, once = true, callback = close })
+  return win
+end
+
 -- ── document builder ───────────────────────────────────────────────────────────────────────────────
 local Builder = {}; Builder.__index = Builder
 function M.builder(width)

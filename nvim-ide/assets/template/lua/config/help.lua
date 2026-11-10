@@ -9,6 +9,8 @@ local features = {
     "<Space>e toggle · in the tree: a add · d delete · r rename · c copy · m move · H show hidden · ? tree help" },
   { "Source Control", "Sidebar with branch, commit box, staged / changed / untracked files. Click a file for its diff, + - x to stage / unstage / discard, buttons to commit, pull, push.",
     "Alt-g · s u x on a file · S U all · m message · c commit · p push · P pull · b branches · ? lists the keys" },
+  { "Right-click menus", "Right-click in the editor (definition, references, rename, format, cut / copy / paste, Claude) or on an Explorer entry (open, new, rename, delete, copy path, terminal here...).",
+    "Esc or a click elsewhere closes the menu · Settings > Features > Right-click menus" },
   { "Tabs", "Slanted tabs with file icon, modified dot and diagnostics. Right-click a tab for pin, move, close others, copy path, reveal in Explorer.",
     "Middle-click or x closes · <Space>bp pin · Alt-< / Alt-> move · Shift-h / Shift-l switch" },
   { "Splits and layouts", "Split, close and maximize editor windows; save a named layout (which files sit in which splits) and load it later.",

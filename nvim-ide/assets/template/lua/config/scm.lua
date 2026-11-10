@@ -49,11 +49,16 @@ local function parse(out)
 end
 
 local render
+local seq = 0
 function M.refresh(cb)
+  seq = seq + 1
+  local mine = seq          -- an older refresh that finishes late must not overwrite a newer result
   git({ "rev-parse", "--show-toplevel" }, function(r)
+    if mine ~= seq then return end
     if r.code ~= 0 then M.root = nil; M.state = { repo = false, staged = {}, changed = {}, untracked = {} }; render(); if cb then cb() end; return end
     M.root = vim.trim(r.stdout)
     git({ "status", "--porcelain=v1", "-b", "--untracked-files=all" }, function(s)
+      if mine ~= seq then return end
       M.state = parse(s.stdout or ""); render(); if cb then cb() end
     end, M.root)
   end, vim.fn.getcwd())
