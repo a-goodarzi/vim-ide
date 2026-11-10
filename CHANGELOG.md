@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.30.1 - Claude panel starts again
+
+The agent-status wrapper ran a bare `claude` through env, which fails when claude is only an alias or lives in ~/.claude/local (the panel then closed at once). It now resolves the claude binary like claudecode.nvim does (setting, PATH, ~/.claude/local, ~/.local/bin, Homebrew, npm, your login shell) and falls back to the plain panel when it cannot find it.
+
 ## 0.30.0 - Claude actions
 
 One key sends the right context to Claude: the problem under the cursor (<Space>ax), an explanation or tests for a line, selection or file (ae, aT), the last terminal output (aL) and the staged diff for review (aR); the prompt is typed into the panel and Enter stays with you. Claude also writes the commit message (the sparkle in the Source Control commit box, or g) and the pull request description in the background with claude -p. Also in the right-click menu and the palette. Verified with the real claude CLI.

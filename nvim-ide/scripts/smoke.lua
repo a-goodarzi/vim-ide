@@ -583,7 +583,9 @@ do
   local A = require("config.agent")
   local js = vim.json.decode(A.settings_json())
   check("agent settings carry the hooks", js.hooks and js.hooks.Stop and js.hooks.Notification and js.hooks.UserPromptSubmit and js.hooks.PreToolUse)
-  check("agent command passes the spool and settings", A.command():find("IDE_AGENT_SPOOL=", 1, true) ~= nil and A.command():find("--settings", 1, true) ~= nil)
+  local cmd = A.command()
+  check("agent command passes the spool and settings (or defers when claude is not installed)", cmd == nil or (cmd:find("IDE_AGENT_SPOOL=", 1, true) ~= nil and cmd:find("--settings", 1, true) ~= nil))
+  check("the claude binary is an absolute path, so env finds it even without PATH", cmd == nil or cmd:find("env IDE_AGENT_SPOOL=%S+ [^ ]*IDE_AGENT_CHECKPOINT=1 /") ~= nil or cmd:find(" /[^ ]*claude --settings", 1) ~= nil or cmd:find("claude --settings", 1, true) ~= nil, cmd)
   check("the hook script is executable", vim.fn.executable(A.hook_path()) == 1)
   -- the hook script appends the event to the spool
   local spool = vim.fn.tempname()

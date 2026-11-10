@@ -21,10 +21,26 @@ function M.settings_json()
   return vim.json.encode({ hooks = hooks })
 end
 
---- The full command the Claude panel runs.
+--- Where the claude CLI lives: the setting, PATH, then the places the installers use (claudecode.nvim looks in the same places).
+--- A bare "claude" would not be found by `env` when it is only an alias or lives in ~/.claude/local.
+function M.claude_bin()
+  local set = (require("config").settings.claude or {}).terminal_cmd
+  if set and set ~= "" then return set end
+  local found = vim.fn.exepath("claude")
+  if found ~= "" then return vim.fn.shellescape(found) end
+  for _, p in ipairs({ "~/.claude/local/claude", "~/.local/bin/claude", "~/.npm-global/bin/claude", "~/.volta/bin/claude", "/opt/homebrew/bin/claude", "/usr/local/bin/claude" }) do
+    p = vim.fn.expand(p)
+    if vim.fn.executable(p) == 1 then return vim.fn.shellescape(p) end
+  end
+  local ok, p = pcall(function() return require("config.path").find("claude") end)   -- ask the login shell
+  return ok and p and vim.fn.shellescape(p) or nil
+end
+
+--- The full command the Claude panel runs, or nil to let claudecode.nvim use its own default (when claude cannot be located here).
 function M.command()
+  local base = M.claude_bin()
+  if not base then return nil end
   M.start()
-  local base = (require("config").settings.claude or {}).terminal_cmd or "claude"
   local cp = require("config").feature("agent_checkpoints") and "IDE_AGENT_CHECKPOINT=1 " or ""
   return ("env IDE_AGENT_SPOOL=%s %s%s --settings %s"):format(vim.fn.shellescape(M.spool), cp, base, vim.fn.shellescape(M.settings_json()))
 end
