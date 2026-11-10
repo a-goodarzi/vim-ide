@@ -22,6 +22,10 @@ function M.editor_items(visual)
   add("Toggle comment", function() vim.cmd(visual and "normal gvgc" or "normal gcc") end)
   items[#items + 1] = "-"
   if require("config").feature("claude") then
+    local line = vim.api.nvim_win_get_cursor(0)[1] - 1
+    if #vim.diagnostic.get(0, { lnum = line }) > 0 then add("Claude: fix this problem", function() require("config.claude_actions").fix() end) end
+    add(visual and "Claude: explain the selection" or "Claude: explain this line", function() vim.cmd(visual and "'<,'>IDEClaudeExplain" or "IDEClaudeExplain") end)
+    add(visual and "Claude: write tests for the selection" or "Claude: write tests for this file", function() vim.cmd(visual and "'<,'>IDEClaudeTests" or "IDEClaudeTests") end)
     add(visual and "Send selection to Claude" or "Ask Claude about this file", function() require("config.assist").ask_selection() end)
   end
   add("Split right", function() require("config.layout").split("right") end)

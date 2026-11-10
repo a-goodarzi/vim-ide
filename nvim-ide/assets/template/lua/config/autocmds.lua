@@ -89,6 +89,12 @@ lazycmd("IDEUpdateReport", "config.updater"); lazycmd("IDERollback", "config.upd
 
 lazycmd("IDEUndoTurn", "config.checkpoints"); lazycmd("IDERedoTurn", "config.checkpoints"); lazycmd("IDECheckpoints", "config.checkpoints")
 
+-- Claude actions (send context, commit message, PR description)
+for _, n in ipairs({ "IDEClaudeFix", "IDEClaudeTerminal", "IDEClaudeReview", "IDECommitMessage", "IDEPRDescription" }) do lazycmd(n, "config.claude_actions") end
+for _, n in ipairs({ "IDEClaudeExplain", "IDEClaudeTests" }) do   -- these take a range (visual selection)
+  vim.api.nvim_create_user_command(n, function(o) require("config.claude_actions"); vim.cmd((o.range > 0 and (o.line1 .. "," .. o.line2) or "") .. n) end, { range = true })
+end
+
 -- Claude activity log
 lazycmd("IDEAgent", "config.agent")
 

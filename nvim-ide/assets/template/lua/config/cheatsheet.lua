@@ -23,7 +23,7 @@ local sections = {
   { "Claude Code", {
     { "<Space>ac / click the Claude button top-right", "Toggle Claude panel" }, { "<Space>af  /  Alt-c", "Focus Claude" }, { "<Space>ab", "Add current file to Claude" },
     { "<Space>as (visual)", "Send selection to Claude" }, { "<Space>ar", "Resume a conversation" },
-    { "<Space>aC", "Continue last conversation" }, { "<Space>am", "Pick model" },
+    { "<Space>aC", "Continue last conversation" }, { "<Space>ax / ae / aT", "Claude: fix this problem / explain / write tests" }, { "<Space>aL / aR", "Claude: terminal output / review staged diff" }, { "<Space>ag / aP", "Claude writes the commit message / PR description" }, { "<Space>au", "Undo the last Claude turn" }, { "<Space>am", "Pick model" },
     { "<Space>aa / ad", "Accept / deny Claude's diff" }, { "Ctrl-\\ Ctrl-n", "Leave terminal mode (Esc goes to Claude)" } } },
   { "Code (LSP)", {
     { "gd / gD / gr / gi", "Definition / declaration / references / implementation" }, { "K", "Hover docs" },

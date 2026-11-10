@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.30.0 - Claude actions
+
+One key sends the right context to Claude: the problem under the cursor (<Space>ax), an explanation or tests for a line, selection or file (ae, aT), the last terminal output (aL) and the staged diff for review (aR); the prompt is typed into the panel and Enter stays with you. Claude also writes the commit message (the sparkle in the Source Control commit box, or g) and the pull request description in the background with claude -p. Also in the right-click menu and the palette. Verified with the real claude CLI.
+
 ## 0.29.0 - Undo agent turns
 
 Before every prompt you send to Claude, the whole working tree is recorded as a hidden git checkpoint (refs/ide-checkpoints, newest 30; your index, branch and stash are untouched). <Space>au undoes the last agent turn (files Claude added are removed, edits and deletions are reverted, with a confirmation), :IDERedoTurn undoes the undo, :IDECheckpoints restores any checkpoint. Verified end to end with the real claude CLI.

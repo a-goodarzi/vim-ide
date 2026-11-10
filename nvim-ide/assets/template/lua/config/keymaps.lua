@@ -68,6 +68,13 @@ map("n", "<leader>se", function() require("config.layout").equalize() end, "Equa
 map("n", "<leader>rt", "<cmd>IDETasks<cr>", "Run task...")
 map("n", "<leader>rr", "<cmd>IDETaskLast<cr>", "Run last task again")
 map("n", "<leader>cS", "<cmd>IDESnippets<cr>", "Browse snippets")
+map("n", "<leader>ax", "<cmd>IDEClaudeFix<cr>", "Claude: fix the problem here")
+map("n", "<leader>ae", "<cmd>IDEClaudeExplain<cr>", "Claude: explain this line"); map("v", "<leader>ae", ":IDEClaudeExplain<cr>", "Claude: explain the selection")
+map("n", "<leader>aT", "<cmd>IDEClaudeTests<cr>", "Claude: write tests for this file"); map("v", "<leader>aT", ":IDEClaudeTests<cr>", "Claude: write tests for the selection")
+map("n", "<leader>aL", "<cmd>IDEClaudeTerminal<cr>", "Claude: send the last terminal output")
+map("n", "<leader>aR", "<cmd>IDEClaudeReview<cr>", "Claude: review the staged diff")
+map("n", "<leader>ag", "<cmd>IDECommitMessage<cr>", "Claude: write a commit message")
+map("n", "<leader>aP", "<cmd>IDEPRDescription<cr>", "Claude: write the pull request description")
 map("n", "<leader>au", "<cmd>IDEUndoTurn<cr>", "Undo the last Claude turn")
 map({ "n", "v" }, "<leader>aq", function() require("config.assist").ask_selection() end, "Ask Claude about selection / file")
 

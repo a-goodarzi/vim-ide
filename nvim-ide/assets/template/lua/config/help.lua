@@ -13,6 +13,8 @@ local features = {
     "Esc or a click elsewhere closes the menu · Settings > Features > Right-click menus" },
   { "Agent status", "The statusline shows what Claude Code is doing (working with the tool name, needs you, done) and a toast appears when it needs a permission or has finished. It uses Claude Code hooks passed with --settings, so your own settings file is untouched.",
     ":IDEAgent activity log · Settings > Claude Code > Agent status / Notify me" },
+  { "Claude actions", "Send the right context in one key: the problem under the cursor, an explanation or tests for a line / selection / file, the last terminal output, the staged diff for review. The prompt is typed into the Claude panel and you press Enter. Claude can also write the commit message (the sparkle in the Source Control commit box, or g) and the pull request description in the background (claude -p).",
+    "<Space>ax fix · ae explain · aT tests · aL terminal output · aR review staged · ag commit message · aP PR description · also in the right-click menu and the palette" },
   { "Undo agent turns", "Before every prompt you send to Claude, the working tree is recorded as a hidden git checkpoint (your index, branch and stash are untouched). Undo the turn, redo it, or restore any of the last 30.",
     "<Space>au undo last turn · :IDERedoTurn · :IDECheckpoints · git for-each-ref refs/ide-checkpoints" },
   { "Tabs", "Slanted tabs with file icon, modified dot and diagnostics. Right-click a tab for pin, move, close others, copy path, reveal in Explorer.",

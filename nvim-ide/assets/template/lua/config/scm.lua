@@ -92,7 +92,8 @@ render = function()
     add(head, "IDEHeading", { kind = "branch" })
     add("")
     local msg = M.msg ~= "" and M.msg or "Commit message (click or press m)"
-    add("  " .. (g and "\xef\x81\x84 " or "> ") .. ui.pad(msg, W - 6), M.msg ~= "" and "Normal" or "IDEMuted", { kind = "msg" })
+    local row = add("  " .. (g and "\xef\x81\x84 " or "> ") .. ui.pad(msg:gsub("\n.*", ""), W - 9) .. " \xe2\x9c\xa6 ", M.msg ~= "" and "Normal" or "IDEMuted", { kind = "msg" })
+    hls[#hls + 1] = { row, #lines[row] - 4, -1, "IDEKey" }    -- the sparkle: click it (or press g) to let Claude write the message
     local br = add("")
     local btn, col, spans = "  ", 2, {}
     for _, b in ipairs({ { "Commit", "commit" }, { "Pull", "pull" }, { "Push", "push" } }) do
@@ -157,6 +158,7 @@ function M.edit_message()
     if v ~= nil then M.msg = v; render() end
   end)
 end
+function M.generate_message() require("config.claude_actions").commit_message() end
 function M.commit()
   local function go()
     if vim.trim(M.msg) == "" then return say("Write a commit message first (m).", vim.log.levels.WARN) end
@@ -233,7 +235,7 @@ local function click(line, wincol)
   if e.kind == "buttons" then
     for _, s in ipairs(e.spans) do if wincol - 1 >= s.from and wincol - 1 < s.to then return run_button(s.act) end end
   elseif e.kind == "branch" then M.branches()
-  elseif e.kind == "msg" then M.edit_message()
+  elseif e.kind == "msg" then if wincol >= W - 4 then M.generate_message() else M.edit_message() end
   elseif e.kind == "init" then M.init()
   elseif e.kind == "section" then if e.staged then M.unstage_all() elseif wincol >= W - 4 then M.stage_all() end
   elseif e.kind == "file" then
@@ -245,7 +247,7 @@ end
 
 local KEYS = {
   { "Enter / click", "Open the file's diff" }, { "o", "Open the file" }, { "s / u / x", "Stage / unstage / discard the file" },
-  { "S / U", "Stage all / unstage all" }, { "m", "Edit the commit message" }, { "c", "Commit (offers to stage all)" },
+  { "S / U", "Stage all / unstage all" }, { "m", "Edit the commit message" }, { "g", "Let Claude write it from the staged diff" }, { "c", "Commit (offers to stage all)" },
   { "p / P", "Push / pull" }, { "b", "Switch or create a branch" }, { "r", "Refresh" }, { "i", "git init (not a repo)" },
 }
 
@@ -274,7 +276,7 @@ function M.open_panel()
   k("<CR>", function() click(vim.api.nvim_win_get_cursor(M.win)[1], 1) end)
   k("o", on_file(function(e) M.open(e, false) end))
   k("s", on_file(M.stage)); k("u", on_file(M.unstage)); k("x", on_file(M.discard))
-  k("S", M.stage_all); k("U", M.unstage_all); k("m", M.edit_message); k("c", M.commit)
+  k("S", M.stage_all); k("U", M.unstage_all); k("m", M.edit_message); k("c", M.commit); k("g", M.generate_message)
   k("p", M.push); k("P", M.pull); k("b", M.branches); k("r", function() M.refresh() end); k("i", M.init); k("?", M.show_keys)
   k("q", function() require("config.activitybar").show("git") end)
   ui.install_click_handler()

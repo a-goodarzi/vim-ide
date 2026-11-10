@@ -653,5 +653,36 @@ do
   check("commands :IDEUndoTurn and :IDECheckpoints exist", vim.fn.exists(":IDEUndoTurn") == 2 and vim.fn.exists(":IDECheckpoints") == 2)
 end
 
+-- Claude actions: prompts, the commit-message helper (with a stubbed claude) and the commands
+do
+  local CA = require("config.claude_actions")
+  vim.cmd("enew"); vim.api.nvim_buf_set_lines(0, 0, -1, false, { "local x = nil", "print(x.y)" }); vim.bo.filetype = "lua"
+  local ns = vim.api.nvim_create_namespace("smoke-claude")
+  vim.diagnostic.set(ns, 0, { { lnum = 1, col = 0, message = "Need check for nil\nmore", severity = vim.diagnostic.severity.WARN } })
+  local p = CA.diagnostic_prompt(0, 1)
+  check("the problem prompt names the line and message", p and p:find(":2: warning", 1, true) and p:find("Need check for nil", 1, true) and not p:find("more", 1, true), p)
+  check("explain and test prompts fence the code", CA.explain_prompt("x = 1", "a.lua", "lua"):find("```lua\nx = 1\n```", 1, true) ~= nil and CA.tests_prompt("x", "a.lua", "lua"):find("Write tests", 1, true) ~= nil)
+  check("no Claude panel means no channel", CA.channel() == nil)
+  -- commit message with a stubbed runner in a scratch repo
+  local d = vim.fn.tempname(); vim.fn.mkdir(d, "p")
+  vim.fn.system({ "git", "-C", d, "init", "-q", "-b", "main" }); vim.fn.writefile({ "hello" }, d .. "/a.txt"); vim.fn.system({ "git", "-C", d, "add", "-A" })
+  local scm, real_runner, seen = require("config.scm"), CA.runner, {}
+  local oldcwd = vim.fn.getcwd(); vim.cmd("cd " .. vim.fn.fnameescape(d)); scm.root = d      -- refreshes look at the working directory
+  CA.runner = function(args, stdin, cb) seen.args, seen.stdin = args, stdin; cb(true, "Add greeting file\n\nBody line") end
+  CA.commit_message(); vim.wait(300)
+  check("the commit message helper sends the staged diff to claude -p", seen.args and seen.args[1] == "-p" and tostring(seen.stdin):find("+hello", 1, true) ~= nil, vim.inspect(seen))
+  check("the generated message lands in the commit box", scm.msg == "Add greeting file\n\nBody line")
+  CA.runner = function(args, stdin, cb) cb(false, "boom") end
+  local real_notify, note = vim.notify, nil
+  vim.notify = function(m) note = m end
+  scm.msg = ""; CA.commit_message(); vim.wait(300)
+  vim.notify = real_notify; CA.runner = real_runner
+  check("a failing claude leaves the box alone and says why", scm.msg == "" and tostring(note):find("boom", 1, true) ~= nil, note)
+  vim.cmd("cd " .. vim.fn.fnameescape(oldcwd)); scm.root = nil
+  for _, c in ipairs({ "IDEClaudeFix", "IDEClaudeExplain", "IDEClaudeTests", "IDEClaudeTerminal", "IDEClaudeReview", "IDECommitMessage", "IDEPRDescription" }) do
+    check("command :" .. c .. " exists", vim.fn.exists(":" .. c) == 2)
+  end
+end
+
 print(string.format("\n%d passed, %d failed", passes, #fails))
 vim.cmd(#fails == 0 and "qa!" or "cquit")
