@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.22.0 - Demo GIF
+
+docs/demo.gif shows the palette, search, source control, terminal, tour and settings; `nvim-ide/scripts/make_demo.py` re-records it from a throw-away project and refuses to publish a screen that shows your user or machine name.
+
 ## 0.21.0 - Install options
 
 A one-line installer with a checksum (install.sh), a Dockerfile to try the IDE without installing (the image builds and passes all smoke tests on a clean Fedora), and a Homebrew formula template. dev.sh no longer fails on an account that has no ~/.config yet.

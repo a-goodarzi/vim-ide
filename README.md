@@ -31,6 +31,10 @@ works inside tmux, and every screen shares one design system.
 
 ## Screenshots
 
+![A short tour: command palette, search, source control, terminal, tour, settings](docs/demo.gif)
+
+(Re-record it with `python3 nvim-ide/scripts/make_demo.py`.)
+
 ![Editor with Explorer, tabs and statusline](docs/screenshots/editor.png)
 
 | Search & Replace | Terminal panel |
